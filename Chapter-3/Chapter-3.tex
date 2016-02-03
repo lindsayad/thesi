@@ -1,0 +1,58 @@
+\chapter{ZAPDOS: A TOOL FOR FULLY COUPLED MODELLING OF PLASMA-LIQUID SYSTEMS}
+
+Zapdos is built on top of the Multiphysics Object-Oriented Simulation Environment (MOOSE) \cite{mooseSite} and libMesh \cite{libmeshSite} codes. MOOSE employs finite element methods (Continuous Galerkin, Discontinuous Galerkin, or a combination) to solve fully coupled (or segregated through the use of MultiApps) systems of partial differential equations (PDEs). After using FEM to discretize the governing equations, MOOSE interfaces with the code PetSc \cite{petscSite} to solve the (non-)linear system of algebraic equations via Newton's method globalized through a line search:
+
+\begin{equation}
+  \tilde{J}(\vec{u}^k)\vec{\delta u}^k = -\vec{R}(\vec{u}^k)
+  \label{eq:Newton}
+\end{equation}
+\begin{equation}
+  \vec{u}^{k+1} = \vec{u}^k + s\vec{\delta u}^k
+  \label{eq:line_search}
+\end{equation}
+
+where $\vec{u}^k$ is the solution vector for iterate $k$, $\vec{R}$ is the residual vector, and $\tilde{J}$ is the Jacobian matrix formed by taking the derivatives of the residual vector with respect to the solution vector.\cite{knoll2004jacobian} \Cref{eq:Newton} may be solved through either direct or iterative methods (usually GMRES with a variety of preconditioning methods including incomplte lower-upper, block jacobi, additive Schwartz, (geometric) algebraic multigrid, etc.). Line search techniques (\cref{eq:line_search}) are based on the methods in \cite{dennis1996numerical}. For application programmers building on top of MOOSE, it is their responsibility to code the residual and Jacobian statements that represent their physics. Residual statements are pieces of the physical governing equations cast in the weak form. A maximally efficient application code in terms of computational time will have a complete and correct set of Jacobian statements corresponding to derivatives of the residuals with respect to the solution variables and will employ the standard Newton method plus line search. If developer time is at a premium, some Jacobian statements can be incomplete or omitted and a Jacobian-Free Newton-Krylov (JFNK) method can be employed in the stead of standard Newton. However, this comes at the cost of computational effiency. The low-temperature plasma application Zapdos has been designed with the former strategy in mind: complete and correct Jacobian statements so that standard Newton can be used. As Zapdos is developed, new pieces of physics with new analytical Jacobians are compared against PetSc Jacobians formed through finite differencing of the residual statements to ensure accuracy.
+
+Zapdos partitions governing equation terms into individual pieces called kernels. Each kernel contains the residual (simply the term cast in weak form) and the corresponding Jacobian statements. Consider the drift flux term in charged particle continuity equations: $\nabla\cdot\left(-sgn(q)\mu\nabla V\right)$. After casting into the weak form and taking the volume term, the corresponding Zapdos code looks like:
+
+\begin{lstlisting}[language=C++]
+Real EFieldAdvection::computeQpResidual()
+{
+  return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_potential[_qp] * -_grad_test[_i][_qp];
+}
+
+Real EFieldAdvection::computeQpJacobian()
+{
+  return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * _phi[_j][_qp] * -_grad_potential[_qp] * -_grad_test[_i][_qp];
+}
+
+Real EFieldAdvection::computeQpOffDiagJacobian(unsigned int jvar)
+{
+  if (jvar == _potential_id)
+    return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_phi[_j][_qp] * -_grad_test[_i][_qp];
+  else
+    return 0.;
+}
+\end{lstlisting}
+
+where \_u is the solution variable that the kernel is applied to (could be any ion species or electron), \_phi and \_test represent finite element shape functions (\_phi = \_test in all cases if using the same order and family of shape functions for all solution variables), and \_qp represent the positions of quadrature points. By splitting governing equations in this way into individual terms/kernels, code reproduction is kept at a minimum; analagous terms can be used in many different settings, e.g. a ``diffusion'' term has the exact same mathematical form as a ``conduction'' or ``viscosity'' term and so the same kernel code can be used for all three physics cases. Material properties like mobilty and diffusivity are defined in a materials file separated from the kernel code. Material properties can be defined as constants, as functions of the solution variables, or as properties to be read from look-up tables. Through MOOSE, Zapdos provides an interface for linear, bilinear, and spline interpolation of material properties. Boundary conditions are available in ``Nodal'' and ``Integrated'' flavors. Nodal boundary conditions are dirichlet like conditions that are enforced strongly. Integrated boundary conditions are cast in the weak form and often arise from performing integration by parts on divergence terms in the governing equations.
+
+At the time of writing Zapdos has the necessary kernels and boundary conditions for solving gas phase DC discharge fluid models as well as conventional convection-diffusion-reaction equations for dilute species in a fluid (a future publication will demonstrate fully-coupled simulation of a DC discharge impinging on a liquid surface). Another student is working on implementing RF plasma simulation capabilities (for capacitively coupled plasmas this will only require slight modification of some boundary conditions; inductively coupled plasmas will require a little more work).
+
+Zapdos solutions are output to an exodus file by default, although MOOSE provides varying levels of support for some other output file formats (including full support for simple CSV). These exodus files are then most commonly viewed graphically with either of the free and open source packages Visit or Paraview. For users more programatically inclined, Paraview provides python tools that enable the user to directly read the exodus file and create publication level plots in MatPlotLib with a single script (as is done for most of the figures in this paper). For transient simulations, results for any solution or auxiliary variable can be viewed while the calculation is on-line. Results are also not lost if a solve is cancelled for any reason. These features enable quick convergence debugging of a failing or failed solve.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.4\textwidth]{Time_step_15.eps}
+  \caption{Propagating front. Time step 15. Note how the mesh is fine around the solution gradients and coarse elsewhere.}
+  \label{fig:step15}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.4\textwidth]{Time_step_49.eps}
+  \caption{Propagating front. Time step 49. Note how the mesh is fine around the solution gradients and coarse elsewhere.}
+  \label{fig:step49}
+\end{figure}
+
+The final feature of Zapdos worth mentioning is the adaptive mesh refinement inherited from MOOSE. The user can choose from several different indicators, including the jump in a solution gradient or laplacian between elements, for determing where mesh refinement should take place. Figures \ref{fig:step15} and \ref{fig:step49} show the propagation of a front through a domain in which the top and bottom halves have different mobilities. The mesh tracks with the head of the front; the mesh is finer in regions of steeper gradients. This feature can be incredibly useful when trying to track ionization bullets or similar phenomena.

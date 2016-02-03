@@ -1,0 +1,16 @@
+*.aux
+*.blg
+*.log
+*.lot
+*.toc
+*.xml
+*.bbl
+*.lof
+*.pdf
+*.out
+*-blx.bib
+*~
+*.dblite
+*.backup
+*.dvi
+*.ps
