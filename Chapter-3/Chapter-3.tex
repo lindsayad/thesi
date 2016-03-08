@@ -1,4 +1,11 @@
 \chapter{ZAPDOS: A TOOL FOR FULLY COUPLED MODELLING OF PLASMA-LIQUID SYSTEMS}
+\label{chap:zapdos}
+
+\section{Zapdos Code}
+\label{sec:zapdos}
+
+\subsection{Zapdos Intro}
+\label{sec:zapdos_intro}
 
 Zapdos is built on top of the Multiphysics Object-Oriented Simulation Environment (MOOSE) \cite{mooseSite} and libMesh \cite{libmeshSite} codes. MOOSE employs finite element methods (Continuous Galerkin, Discontinuous Galerkin, or a combination) to solve fully coupled (or segregated through the use of MultiApps) systems of partial differential equations (PDEs). After using FEM to discretize the governing equations, MOOSE interfaces with the code PetSc \cite{petscSite} to solve the (non-)linear system of algebraic equations via Newton's method globalized through a line search:
 
@@ -11,11 +18,11 @@ Zapdos is built on top of the Multiphysics Object-Oriented Simulation Environmen
   \label{eq:line_search}
 \end{equation}
 
-where $\vec{u}^k$ is the solution vector for iterate $k$, $\vec{R}$ is the residual vector, and $\tilde{J}$ is the Jacobian matrix formed by taking the derivatives of the residual vector with respect to the solution vector.\cite{knoll2004jacobian} \Cref{eq:Newton} may be solved through either direct or iterative methods (usually GMRES with a variety of preconditioning methods including incomplte lower-upper, block jacobi, additive Schwartz, (geometric) algebraic multigrid, etc.). Line search techniques (\cref{eq:line_search}) are based on the methods in \cite{dennis1996numerical}. For application programmers building on top of MOOSE, it is their responsibility to code the residual and Jacobian statements that represent their physics. Residual statements are pieces of the physical governing equations cast in the weak form. A maximally efficient application code in terms of computational time will have a complete and correct set of Jacobian statements corresponding to derivatives of the residuals with respect to the solution variables and will employ the standard Newton method plus line search. If developer time is at a premium, some Jacobian statements can be incomplete or omitted and a Jacobian-Free Newton-Krylov (JFNK) method can be employed in the stead of standard Newton. However, this comes at the cost of computational effiency. The low-temperature plasma application Zapdos has been designed with the former strategy in mind: complete and correct Jacobian statements so that standard Newton can be used. As Zapdos is developed, new pieces of physics with new analytical Jacobians are compared against PetSc Jacobians formed through finite differencing of the residual statements to ensure accuracy.
+where $\vec{u}^k$ is the solution vector for iterate $k$, $\vec{R}$ is the residual vector, and $\tilde{J}$ is the Jacobian matrix formed by taking the derivatives of the residual vector with respect to the solution vector.\cite{knoll2004jacobian} \Cref{eq:Newton} may be solved through either direct or iterative methods (usually GMRES with a variety of preconditioning methods including incomplete lower-upper, block jacobi, additive Schwartz, (geometric) algebraic multigrid, etc.). Line search techniques (\cref{eq:line_search}) are based on the methods in \cite{dennis1996numerical}. For application programmers building on top of MOOSE, it is their responsibility to code the residual and Jacobian statements that represent their physics. Residual statements are pieces of the physical governing equations cast in the weak form. A maximally efficient application code in terms of computational time will have a complete and correct set of Jacobian statements corresponding to derivatives of the residuals with respect to the solution variables and will employ the standard Newton method plus line search. If developer time is at a premium, some Jacobian statements can be incomplete or omitted and a Jacobian-Free Newton-Krylov (JFNK) method can be employed instead of standard Newton. However, this comes at the cost of computational effiency. The low-temperature plasma application Zapdos has been designed with the former strategy in mind: complete and correct Jacobian statements so that standard Newton can be used. As Zapdos is developed, new pieces of physics with new analytical Jacobians are compared against PetSc Jacobians formed through finite differencing of the residual statements to ensure accuracy.
 
-Zapdos partitions governing equation terms into individual pieces called kernels. Each kernel contains the residual (simply the term cast in weak form) and the corresponding Jacobian statements. Consider the drift flux term in charged particle continuity equations: $\nabla\cdot\left(-sgn(q)\mu\nabla V\right)$. After casting into the weak form and taking the volume term, the corresponding Zapdos code looks like:
+Zapdos partitions governing equation terms into individual pieces called kernels. Each kernel contains the residual (simply the term cast in weak form) and the corresponding Jacobian statements. Consider the drift flux term in charged particle continuity equations: $\nabla\cdot\left(-sgn(q_i)\mu_in_i\nabla V\right)$. After casting into the weak form and taking the volume term, the corresponding Zapdos code looks like:
 
-\begin{lstlisting}[language=C++]
+\begin{lstlisting}[language=C++,caption = Example of residual and Jacobian function definitions, label = code:resid_jacob]
 Real EFieldAdvection::computeQpResidual()
 {
   return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_potential[_qp] * -_grad_test[_i][_qp];
@@ -39,7 +46,7 @@ where \_u is the solution variable that the kernel is applied to (could be any i
 
 At the time of writing Zapdos has the necessary kernels and boundary conditions for solving gas phase DC discharge fluid models as well as conventional convection-diffusion-reaction equations for dilute species in a fluid (a future publication will demonstrate fully-coupled simulation of a DC discharge impinging on a liquid surface). Another student is working on implementing RF plasma simulation capabilities (for capacitively coupled plasmas this will only require slight modification of some boundary conditions; inductively coupled plasmas will require a little more work).
 
-Zapdos solutions are output to an exodus file by default, although MOOSE provides varying levels of support for some other output file formats (including full support for simple CSV). These exodus files are then most commonly viewed graphically with either of the free and open source packages Visit or Paraview. For users more programatically inclined, Paraview provides python tools that enable the user to directly read the exodus file and create publication level plots in MatPlotLib with a single script (as is done for most of the figures in this paper). For transient simulations, results for any solution or auxiliary variable can be viewed while the calculation is on-line. Results are also not lost if a solve is cancelled for any reason. These features enable quick convergence debugging of a failing or failed solve.
+Zapdos solutions are output to an exodus file by default, although MOOSE provides varying levels of support for some other output file formats (including full support for simple CSV). These exodus files are then most commonly viewed graphically with either of the free and open source packages Visit or Paraview. For users more programatically inclined, Paraview provides python tools that enable the user to directly read the exodus file and create publication level plots in MatPlotLib with a single script (as is done for a lot of figures in this dissertation). For transient simulations, results for any solution or auxiliary variable can be viewed while the calculation is on-line. Results are also not lost if a solve is cancelled for any reason. These features enable quick convergence debugging of a failing or failed solve.
 
 \begin{figure}[htbp]
   \centering
@@ -55,4 +62,487 @@ Zapdos solutions are output to an exodus file by default, although MOOSE provide
   \label{fig:step49}
 \end{figure}
 
-The final feature of Zapdos worth mentioning is the adaptive mesh refinement inherited from MOOSE. The user can choose from several different indicators, including the jump in a solution gradient or laplacian between elements, for determing where mesh refinement should take place. Figures \ref{fig:step15} and \ref{fig:step49} show the propagation of a front through a domain in which the top and bottom halves have different mobilities. The mesh tracks with the head of the front; the mesh is finer in regions of steeper gradients. This feature can be incredibly useful when trying to track ionization bullets or similar phenomena.
+Another feature of Zapdos worth mentioning is the adaptive mesh refinement inherited from MOOSE. The user can choose from several different indicators, including the jump in a solution gradient or laplacian between elements, for determing where mesh refinement should take place. Figures \ref{fig:step15} and \ref{fig:step49} show the propagation of a front through a domain in which the top and bottom halves have different mobilities. The mesh tracks with the head of the front; the mesh is finer in regions of steeper gradients. This feature can be incredibly useful when trying to track ionization bullets or similar phenomena.
+
+\subsection{Zapdos Kernels}
+\label{sec:zap_kernels}
+
+As mentioned in the introductory section, Zapdos takes each term in a governing equation and casts that term as a class with methods for computing the residual and Jacobian. These governing equation term classes are called kernels. At the time of writing, Zapdos has 77 kernels. However, not all of these have utility, e.g. one kernel may have been re-cast as a new class without the old class being removed from the kernel directory. The most important kernels, e.g. the ones actively being used for physics and engineering research, are enumerated below. An important feature of Zapdos is the option to cast concentration or density variables in a logarithmic form, e.g. $N_k = \ln\left(n_k\right)$ where $N_k$ is the logarithmic variable representation of the density and $n_k$ is the true physical density. This is done for the modelling studies presented in \cref{sec:plasliq}. The advantage of the logarithmic casting is that it prevents the true concentration from ever becoming negative. Negative concentrations can be a product of and contribute to numerical instabilities. Negative concentrations can cause source terms to become sink terms and visa versa, thus it is advantageous to avoid them if possible.
+
+Also for all the simulations described in \cref{sec:plasliq}, it is the logarithm of the \textit{product} of the electron density and mean energy that is a solution variable as opposed to simply the logarithm of the mean energy. Thus for the simplest plasma discharge simulation, there are four solution variables:
+
+\begin{gather}\label{eq:soln_vars}
+  N_i = \ln n_i\\
+  N_e = \ln n_e\\
+  E_n = \ln\left(n_e\epsilon\right)\\
+  V = V
+\end{gather}
+
+where n$_i$ and n$_e$ are the physical ion and electron densities respectively, $\epsilon$ is the mean electron energy, and V is the potential. While the choice to use the product of n$_e$ and $\epsilon$ simplifies some parts of the governing equation, it complicates others. In particular the electron transport and Townsend coefficients that are functions of the mean electron energy become functions of two solution variables, N$_e$ and E$_n$, as opposed to just one. Thus residual/governing equation terms that involve electron transport or Townsend coefficients must include Jacobian contributions from both N$_e$ and E$_n$.
+
+In order to improve conditioning of the Jacobian, Zapdos provides the user options for unit scaling. The potential can either be cast in units of volts or kilovolts (this will be made even more flexible in the future). This choice is made in the GlobalParams block of the Zapdos input file, by specifying $potential\_units = V$ or $potential\_units = kV$. The length units can also be scaled. In the coupled plasma-liquid simulations described in \cref{sec:plasliq}, the plasma domain length is 1 mm, whereas the water domain length is 100 nm. Thus at the beginning of the input file, in order to scale closer to unity, we specify $dom0scale = 1e-3$ and $dom1scale = 1e-7$. The values of $dom0Scale$ and $dom1Scale$ can then be accessed using GetPot's Dollar Bracket Expressions (DBE) syntax, \$\{\}. Thus for any kernel or boundary condition that contains a gradient term, we specify the parameter: $position\_units = \$\{dom0Scale\}$ or $position\_units = \$\{dom1Scale\}$ depending on whether the kernel or boundary condition is acting in the gas or liquid phase. Unlike the $potential\_units$ parameter which must be a string equal to $V$ or $kV$, the $position\_units$ parameter can be set to any real number. The length scaling is represented in \cref{tab:zap_kernels} as the symbol $l_c$ where $l_c$ is actually equal to $1/position\_units$; the potential scaling is represented by $V_c$ where $V_c=1000$ if $potential\_units=kV$ else $V_c=1$ if $potential\_units=V$.
+
+Zapdos tries to be as generic and modular as possible in the formulation of its kernels, e.g. a diffusion kernel code should be as applicable to the diffusion of Argon ions in the gas phase as it is to neutral OH radicals in the liquid phase. However, advection-diffusion-reaction (ADR) terms for electrons in the plasma typically have to have their own kernels because the transport and Townsend coefficients are allowed to be functions of the mean electron energy as opposed to constants. In this case Jacobian terms must be provided for the coefficient functional dependence on both N$_e$ and E$_N$. This functional dependence does not exist when the coefficients are constant as in the cases where we are modelling transport of heavy ions and neutrals, thus those kernels can be completely generic. For generic kernels, the solution variable is denoted by $u$ in \cref{tab:zap_kernels}; a coupled solution variable is denoted by $v$. Note that the kernel residuals/governing equation terms are cast in the weak form, i.e. each term in the governing equation is multiplied by a test function $\psi_i$ where $i$ denotes the $i^{th}$ shape function. Divergence terms, e.g. flux terms, are integrated by parts to produce both a volumetric kernel term and a surface boundary condition term (or surface discontinuous Galerkin term if a discontinuous Galerkin discretization is used).
+
+\begin{ThreePartTable}
+  \begin{TableNotes}
+    %% \footnotesize
+    \item [a] \(\displaystyle \vec{\Gamma_e} = \mu_e(N_e,E_n) \nabla V l_c e^{N_e} - D_e(N_e,E_n) e^{N_e} \nabla N_e l_c\)
+  \end{TableNotes}
+
+  \begin{longtable}{>{\centering}m{2.25in}| >{\centering}m{1.75in}| >{\raggedright\arraybackslash}m{2in}}
+    %% \hline\hline
+    %% This goes at & the top of the & first heading\\
+    %% \hline\hline
+    %% \endfirsthead
+    \textbf{Kernel Name} & \textbf{Governing Eqn. Term}\tnote{a} & \textbf{Description}\\\hline\hline
+    \endhead
+    \caption{Kernels in Zapdos used for simulations presented in \cref{sec:plasliq}}
+    \endfoot
+    \caption{Kernels in Zapdos used for simulations presented in \cref{sec:plasliq}}
+    \label{tab:zap_kernels}
+    \endlastfoot
+
+    ElectronTimeDerivative & \(\displaystyle \psi_i e^u\frac{\partial u}{\partial t}\) & Generic accumulation term\\\hline
+    EFieldAdvectionElectrons & \(\displaystyle -\nabla\psi_i \mu_e(N_e,E_n) e^{N_e}\nabla V /l_c^2\) & Electron specific electric field driven advection term\\\hline
+    CoeffDiffusionElectons & \(\displaystyle \nabla\psi_i D_e(N_e,E_n) e^{N_e} \nabla N_e /l_c^2\) & Electron specific diffusion term\\\hline
+    ElectronsFromIonization & \(\displaystyle -\psi_i \alpha_{iz}(E_n,N_e) \lvert\vec{\Gamma_e}\rvert\) & Rate of production of electrons from ionization\\\hline
+    LogStabilizationMoles & \(\displaystyle -\psi_i e^{-(b+u)}\) & Kernel stabilizes solution variable $u$ in places where $u\rightarrow 0$; $b$ is the offset value specified by the user. A typical value for $b$ is 20.\\\hline
+    EFieldAdvection & \(\displaystyle -\nabla \psi_i \mu\sgn(q) e^u \cdot -\nabla V /l_c^2\) & Generic electric field driven advection term\\\hline
+    CoeffDiffusion & \(\displaystyle -\nabla \psi_i -D_e e^u \nabla u /l_c^2\) & Generic diffusion term\\\hline
+    ReactantFirstOrderRxn & \(\displaystyle \psi_i k e^u\) & Generic first order reaction sink term for $u$ ($u$ is the reactant); $k$ is the reaction rate coefficient\\\hline
+    ReactantAARxn & \(\displaystyle 2 \psi_i k e^{2u}\) & Generic second order reaction sink term for $u$ in which two molecules of $u$ are consumed\\\hline
+    CoeffDiffusionLin & \(\displaystyle -\nabla \psi_i \cdot -D \nabla u /l_c^2\) & Generic \textit{linear} diffusion term, e.g. this is a diffusion term for solution variables \textit{not} cast in a logarithmic form\\\hline
+    ChargeSourceMoles\_KV & \(\displaystyle \frac{-\psi_i e \sgn(q) N_A e^v}{V_c}\) & Used for adding charged sources to Poisson's equation; $e^v$ represents the charged particle density of species $v$. This kernel assumes that densities are measured in units of mol/volume as opposed to \#/volume.\\\hline
+    IonsFromIonization & \(\displaystyle -\psi_i \alpha_{iz}(E_n,N_e) \lvert\vec{\Gamma_e}\rvert\) & Same governing term/residual as ElectronsFromIonization; however, the Jacobian structure is different. $\frac{\partial R_i}{\partial N_e}$ will be on-diagonal for ElectronsFromIonization and off-diagonal for IonsFromIonization\\\hline
+    ProductFirstOrderRxn & \(\displaystyle -\psi_i k e^v\) & Generic first order reaction source term for $u$ ($v$ is the reactant)\\\hline
+    ProductAABBRxn & \(\displaystyle -2\psi_i k e^{2v}\) & Generic second order reaction source term in which two molecules of $v$ are produced from two molecules of $u$\\\hline
+    EFieldAdvectionEnergy & \(\displaystyle -\nabla \psi_i \mu_{\epsilon}(N_e,E_n) e^{E_n} \cdot \nabla V /l_c^2\) & Electron energy specific electric field driven advection term\\\hline
+    CoeffDiffusionEnergy & \(\displaystyle -\nabla \psi_i \cdot -D_{\epsilon}(N_e,E_n) e^{E_n}\nabla E_n /l_c^2\) & Electron energy specific diffusion term\\\hline
+    JouleHeating & \(\displaystyle -\psi_i \nabla V V_c /l_c \cdot \vec{\Gamma_e}\) & Joule heating term for electrons\\\hline
+    ElectronEnergyLossFromIonization & \(\displaystyle \psi_i \alpha_{iz}(N_e,E_n)\lvert\vec{\Gamma_e}\rvert E_{iz}\) & Electron energy loss term for inelastic ionization collisions; $E_{iz}$ is the energy lost in Volts in a single ionization collision\\\hline
+    ElectronEnergyLossFromExcitation & \(\displaystyle \psi_i \alpha_{ex}(N_e,E_n)\lvert\vec{\Gamma_e}\rvert E_{ex}\) & Electron energy loss term for inelastic excitation collisions; $E_{ex}$ is the energy lost in Volts in a single excitation collision\\\hline
+    ElectronEnergyLossFromElastic & \(\displaystyle \psi_i \alpha_{el}(N_e,E_n)\lvert\vec{\Gamma_e}\rvert \frac{3m_eT_e}{m_n}\) & Electron energy loss term for elastic collisions. $\alpha_{el}$ is the elastic Townsend coefficient; $m_e$ is the electron mass; $m_n$ is the mass of the neutral background gas; $T_e = \frac{2\epsilon}{3}$ is the electron temperature\\\hline
+    \insertTableNotes
+  \end{longtable}
+\end{ThreePartTable}
+
+\subsection{Zapdos Auxiliary Kernels}
+\label{sec:zap_aux}
+
+Zapdos implements a variety of auxiliary kernels that, while not essential to the solve, are important for visualizing and understanding the plasma-liquid physics. The auxiliary kernels that are employed for the simulations in \cref{sec:plasliq} are outlined in \cref{tab:aux_kernels}.
+
+\begin{ThreePartTable}
+  \begin{TableNotes}
+    %% \footnotesize
+    %% \item [a]
+  \end{TableNotes}
+
+  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{2in}}
+    \textbf{AuxKernel Name} & \textbf{Expression} & \textbf{Description}\\\hline\hline
+    \endhead
+    \caption{AuxKernels in Zapdos used for visualization of simulation results described in \cref{sec:plasliq}}
+    \endfoot
+    \caption{AuxKernels in Zapdos used for visualization of simulation results described in \cref{sec:plasliq}}
+    \label{tab:aux_kernels}
+    \endlastfoot
+
+    PowerDep & \(\displaystyle \sgn(q)e N_A\cdot(\sgn(q)\mu\cdot-\nabla V e^{N_k} - D e^{N_k} \nabla N_k) \cdot -\nabla V V_c/l_c^2\) & Amount of power deposited into a user specified specie by Joule Heating\\\hline
+    ProcRate & \(\displaystyle N_A \cdot \abs{-\mu_e\cdot-\nabla V e^{N_e} - D_e e^{N_e} \nabla N_e} \cdot \alpha /l_c\) & Reaction rate for electron impact collisions in units of $\frac{\#}{m^3s}$. User can pass choice of elastic, excitation, or ionization\\\hline
+    ElectronTemperature & \(\displaystyle \frac{2}{3}e^{E_n-N_e}\) & The electron temperature\\\hline
+    Position & \(\displaystyle x l_c\) & Produces an elemental auxiliary variable useful for plotting against other elemental auxiliary variables. Mesh points automatically output by Zapdos only work for plotting nodal variables. Since almost all auxiliary variables are elemental, this AuxKernel is very important.\\\hline
+    Density & \(\displaystyle e^{N_k} N_A\) & Returns physical densities in units of $\frac{\#}{m^3}$\\\hline
+    Efield & \(\displaystyle -\nabla V / l_c\) & Returns the x-component of the electric field (only relevant component for 1-D simulations)\\\hline
+    Current & \(\displaystyle \sgn(q_k) e N_A \cdot(\sgn(q)\mu_k\cdot-\nabla V e^{N_k} / l_c - D_k e^{N_k} \nabla N_k / l_c)\) & Returns the electric current associated with the flux of species $k$\\\hline
+    EFieldAdvAux & \(\displaystyle \sgn(q_k)\mu_k e^{N_k} \cdot -\nabla V N_A / l_c\) & Returns the electric field driven advective flux of species $k$\\\hline
+    DiffusiveFlux & \(\displaystyle -D_k e^{N_k} \nabla N_k N_A / l_c\) & Returns the diffusive flux of species $k$\\\hline
+  \end{longtable}
+\end{ThreePartTable}
+
+\subsection{Zapdos Interface Kernels}
+\label{sec:zap_interface}
+
+Critical to fully coupling the plasma and liquid phase simulations are the conditions at the interface. Initially, it was not possible to create interfacial conditions in Zapdos because the capability did not exist in the MOOSE framework. However, as described in \cref{sec:moose}, we were able to add the capability to the framework, and thus it is now possible to create interfacial conditions in Zapdos. A couple important ones that are used in mean\_en.i (see \cref{sec:zap_input}) are described in \cref{tab:interface}.
+
+\begin{ThreePartTable}
+
+  \begin{TableNotes}
+  \end{TableNotes}
+
+  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{2in}}
+    \textbf{InterfaceKernel Name} & \textbf{Expression} & \textbf{Description}\\\hline\hline
+    \endhead
+    \caption{Important InterfaceKernels in Zapdos}
+    \endfoot
+    \caption{Important InterfaceKernels in Zapdos}
+    \label{tab:interface}
+    \endlastfoot
+
+    InterfaceAdvection & \(\displaystyle -\psi_{i,el}\mu_{k,n}\sgn(q_k) e^{N_{k,n}}\nabla V_n \cdot \vec{n} / (l_{c,n}l_{c,el})\) & Used to include the electric field driven advective flux of species $k$ into or out of a neighboring subdomain. The subscript $el$ denotes the subdomain to which the InterfaceAdvection residual is being added. The subscript $n$ denotes the neighboring subdomain. Currently this interface kernel is specific to electrons because the transport coefficients are assumed to be a function of the mean electron energy. A generic interface kernel with constant transport coefficients will have a much simpler Jacobian\\\hline
+    InterfaceLogDiffusionElectrons & \(\displaystyle -\psi_{i,el} D_{k,n} e^{N_{k,n}} \nabla N_{k,n} \cdot \vec{n} / (l_{c,n}l_{c,el})\) & Used to include the diffusive flux of species $k$ into or out of a neighboring subdomain. Also currently specific to electrons.\\\hline
+  \end{longtable}
+\end{ThreePartTable}
+
+\subsection{Zapdos Boundary Conditions}
+\label{sec:zap_bcs}
+
+Zapdos boundary conditions at the cathode are based on the work in \cite{hagelaar2000boundary} and \cite{sakiyama2007nonthermal}. For ions, electrons, and the electron energy, the most commonly used conditions are respectively (in strong form and without scaling factors):
+
+\begin{equation}
+  \vec{\Gamma_i}\cdot\vec{n} = \frac{1-r_i}{1+r_i}\left(\left(2a_i-1\right)\mu_i\vec{E}\cdot\vec{n}n_i + \frac{1}{2}v_{th,i}n_i\right)
+  \label{eq:ion_bc}
+\end{equation}
+\begin{equation}
+    \vec{\Gamma_e}\cdot\vec{n} = \frac{1-r_{dens}}{1+r_{dens}}\left(-\left(2a_e-1\right)\mu_e\vec{E}\cdot\vec{n}\left(n_e-n_{\gamma}\right) + \frac{1}{2}v_{th,e}\left(n_e-n_{\gamma}\right)\right) - \left(1-a_e\right)\gamma_p\vec{\Gamma_p}\cdot\vec{n}
+  \label{eq:electron_bc}
+\end{equation}
+\begin{equation}
+    \vec{\Gamma_{\epsilon}}\cdot\vec{n} = \frac{1-r_{en}}{1+r_{en}}\left(-\left(2a_e-1\right)\frac{5}{3}\mu_e\vec{E}\cdot\vec{n}\left(n_e\epsilon-n_{\gamma}\epsilon_{\gamma}\right) + \frac{5}{6}v_{th,e}\left(n_e\epsilon-n_{\gamma}\epsilon_{\gamma}\right)\right) - \frac{5}{3}\epsilon_{\gamma}\left(1-a_e\right)\gamma_p\vec{\Gamma_p}\cdot\vec{n}
+  \label{eq:energy_bc}
+\end{equation}
+
+where $r_i$, $r_{dens}$, $r_{en}$ are the boundary reflection coefficients for ions, electrons, and electron energy respectively (more discussion on $r_{en}$ shortly), $\gamma_p$ is the secondary electron emission coefficient, $\epsilon_{\gamma}$ is the energy of the secondary electrons, $\vec{n}$ is the outward facing normal vector, and:
+
+\begin{equation}
+  a_k =
+    \begin{cases}
+      1, & sgn_k\mu_k\vec{E}\cdot\vec{n}>0 \\
+      0, & sgn_k\mu_k\vec{E}\cdot\vec{n}\leq0
+    \end{cases}
+  \label{eq:a}
+\end{equation}
+\begin{equation}
+  v_{th,k} = \sqrt{\frac{8T_k}{\pi m_k}}
+  \label{eq:v_th}
+\end{equation}
+\begin{equation}
+  n_{\gamma} = \left(1-a_e\right)\frac{\gamma_p\vec{\Gamma_p}\cdot\vec{n}}{\mu_e\vec{E}\cdot\vec{n}}
+  \label{eq:n_gamma}
+\end{equation}
+
+where $v_{th,k}$ is the thermal velocity of species $k$ and $n_{\gamma}$ is the density of secondary electrons. A thermodynamic interfacial condition is also available:
+
+\begin{equation}
+  Hn_{e,g} = n_{e,l}
+  \label{eq:electron_bc_thermo}
+\end{equation}
+
+For ions and electrons in the liquid phase, depending on the polarity of the discharge, a simple outflow BC is used at the counter electrode at the bottom of the liquid. Its strong form is:
+
+\begin{equation}
+  \vec{\Gamma_k}\cdot\vec{n} = -a_k \mu_k \sgn(q_k) e^{N_k} \nabla V \cdot \vec{n}
+  \label{eq:outflow}
+\end{equation}
+
+For potential conditions, grounding is done using a DirichletBC class inherited from MOOSE. The other boundary condition incorporates an external ballast resistor:
+
+\begin{equation}
+  V_{source} + V_{cathode} = \left(e\vec{\Gamma_i} - e\vec{\Gamma_e}\right)AR
+  \label{eq:cathode}
+\end{equation}
+
+A summary of the important boundary condition classes that Zapdos defines are summarized in \cref{tab:bcs}.
+
+\begin{ThreePartTable}
+
+  \begin{TableNotes}
+  \end{TableNotes}
+
+  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{2in}}
+    \textbf{BoundaryCondition Name} & \textbf{Expression (strong form and without scaling factors)} & \textbf{Description}\\\hline\hline
+    \endhead
+    \caption{Important BoundaryConditions defined by Zapdos}
+    \endfoot
+    \caption{Important BoundaryConditions defined by Zapdos}
+    \label{tab:bcs}
+    \endlastfoot
+
+    HagelaarIonBC & \cref{eq:ion_bc} & Kinetic ion boundary condition\\\hline
+    HagelaarElectronBC & \cref{eq:electron_bc} & Kinetic electron boundary condition\\\hline
+    HagelaarEnergyBC & \cref{eq:energy_bc} & Kinetic electron energy boundary condition\\\hline
+    DCIonBC & \cref{eq:outflow} & Electric field driven outflow boundary condition\\\hline
+    NeumannCircuitVoltageMoles\_KV & \cref{eq:cathode} & Circuit boundary condition for potential\\\hline
+    MatchedValueLogBC & \cref{eq:electron_bc_thermo} & Henry's Law like thermodynamic boundary condition for specifying a specie concentration ratio at the gas-liquid interface\\\hline
+  \end{longtable}
+\end{ThreePartTable}
+
+\subsection{Zapdos Materials}
+\label{sec:zap_materials}
+
+Transport, rate, and other properties are defined in class files in the materials directory of Zapdos. Gas properties (whether argon, air, etc.) are defined in the class file Gas.C. Aqueous solute properties are defined in the class file Water.C. In the gas phase, electron transport and Townsend rate coeffiecients are functions of the electron mean energy (or alternatively they can be functions of the local electric field). As shown in \cref{code:read_in}, this data is read in from a whitespace-delimited look-up table from a text input file. The look-up table data is parsed into interpolation objects. There are several interpolation types that MOOSE application developers can choose from; we have chosen to use a spline interpolator. Because a spline interpolator provides C$^2$ continuity, there are no derivative jumps with respect to the mean energy. This in turn makes for continuous Jacobian functions, leading to markedly improved convergence over a linear interpolator for example.
+
+\begin{lstlisting}[language=C++, caption = Code for reading in electron transport and Townsend coefficient data from a lookup table in a text file, label = code:read_in]
+  std::string tdPath = "/src/materials/td_argon_mean_en.txt";
+  std::string path = zapDir + tdPath;
+  const char *charPath = path.c_str();
+  std::ifstream myfile (charPath);
+  Real value;
+
+  if (myfile.is_open())
+  {
+    while ( myfile >> value )
+    {
+      actual_mean_energy.push_back(value);
+      myfile >> value;
+      alpha.push_back(value);
+      myfile >> value;
+      alphaEx.push_back(value);
+      myfile >> value;
+      alphaEl.push_back(value);
+      myfile >> value;
+      mu.push_back(value);
+      myfile >> value;
+      diff.push_back(value);
+    }
+    myfile.close();
+  }
+
+  else std::cerr << "Unable to open file" << std::endl;
+
+  _alpha_interpolation.setData(actual_mean_energy, alpha);
+  _alphaEx_interpolation.setData(actual_mean_energy, alphaEx);
+  _alphaEl_interpolation.setData(actual_mean_energy, alphaEl);
+  _mu_interpolation.setData(actual_mean_energy, mu);
+  _diff_interpolation.setData(actual_mean_energy, diff);
+\end{lstlisting}
+
+\Cref{code:mat_def} shows definition of both constant material properties and solution variable-dependent properties. In this particular codeblock the code tests whether the user wants the electron mobility and diffusivity to be functions of the mean energy. If so, the interpolator \textbf{sample} method is called to retrieve the property at the corresponding value for the mean energy (recall that $\epsilon$ is a function of $E_n$ and $N_e$; see \cref{eq:soln_vars}). In addition the interpolator's \textbf{sampleDerivative} method is also called; its returned value is used in the Jacobian methods of any kernels or boundary conditions that rely on the corresponding material property. If the user does not want to interpolate the transport coefficients, then they are set to some constant sane values. The code block also shows how the properties are scaled depending on the choice of potential units.
+
+\begin{lstlisting}[language=C++, caption = Material property definition, label = code:mat_def]
+  if (_interp_trans_coeffs) {
+    _muem[_qp] = _mu_interpolation.sample(std::exp(_mean_en[_qp]-_em[_qp])) * _voltage_scaling;
+    _d_muem_d_actual_mean_en[_qp] = _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp]-_em[_qp])) * _voltage_scaling;
+    _diffem[_qp] = _diff_interpolation.sample(std::exp(_mean_en[_qp]-_em[_qp]));
+    _d_diffem_d_actual_mean_en[_qp] = _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp]-_em[_qp]));
+  }
+  else {
+    // From bolos at atmospheric pressure and an EField of 2e5 V/m
+    _muem[_qp] = 0.0352103411399 * _voltage_scaling; // units of m^2/(kV*s) if _voltage_scaling = 1000
+    _d_muem_d_actual_mean_en[_qp] = 0.0;
+    _diffem[_qp] = 0.297951680159;
+    _d_diffem_d_actual_mean_en[_qp] = 0.0;
+  }
+\end{lstlisting}
+
+
+\subsection{Meshing for Zapdos}
+\label{sec:zap_meshing}
+
+Meshes required for Zapdos input files are generated using the program Gmsh. \cite{geuzaine2009gmsh} An example Gmsh input file is shown in \cref{code:gmsh}. The scaling used in the mesh input file is the inverse of the scaling used in the Zapdos input file, e.g. $dom0Mult = 1/dom0Scale$. For typical plasma simulations, the characteristic length of the mesh is much finer in the boundary regions than in the plasma bulk. For the input file below, which is representative of the meshes used for \cref{sec:plasliq}, the characteristic length of the mesh is 2 nm at the cathode and 1 nm at the plasma-liquid interface with the mesh characteristic length peaking at 50 $\mu$m in the center of the discharge. In the liquid phase, the characteristic length in the bulk is 10 nm.
+
+\begin{lstlisting}[caption=Gmsh input file used to create plasma and liquid domains for simulations in \cref{sec:plasliq}, label=code:gmsh]
+dom0Mult = 1e3;
+dom1Mult = 1e7;
+// dom0Mult = 1;
+// dom1Mult = 1;
+
+Point(1) = {0, 0, 0, 2e-9 * dom0Mult};
+Point(3) = {.5e-3 * dom0Mult, 0, 0, 50e-6 * dom0Mult};
+Line(2) = {1,3};
+Point(8) = {1e-3 * dom0Mult, 0, 0, 1e-9 * dom0Mult};
+Line(7) = {3,8};
+Point(9) = {1e-3 * dom0Mult + 50e-9 * dom1Mult, 0, 0, 10e-9 * dom1Mult};
+Line(8) = {8,9};
+Point(10) = {1e-3 * dom0Mult + 100e-9 * dom1Mult, 0, 0, 10e-9 * dom1Mult};
+Line(9) = {9,10};
+Physical Line(0) = {2,7};
+Physical Line(1) = {8,9};
+\end{lstlisting}
+
+\subsection{Postprocessing Zapdos results}
+\label{sec:zap_post}
+
+Zapdos by default outputs results to an exodus file. Our preferred tool for processing these results is the open-source application Paraview. \cite{paraview} Paraview offers both a GUI as well as python modules for processing data in a variety of formats, including exodus. Using the python interface, we can script creation of Paraview readers and write data for specific time steps as well as perform many other functions. In the case where we are simulating to steady-state a DC discharge from some arbitrary initial state, solution data from the last time point are mostly what we care about. Using Paraview's CSV writer from within python, we write the data to a csv file, from which we can then load the data into numpy data arrays. These steps are achieved in a single python method that we developed; it is shown in \cref{code:load_data}. Once nodal and elemental variables have been loaded into numpy arrays, python's matplotlib package can be used to render publication-quality figures. This is automated using generic figure scripts shown in \cref{code:elem_plot,code:nodal_plot}.
+
+
+\section{Modifying the MOOSE Framework}
+\label{sec:moose}
+
+Essential to the simulation of plasma-liquid systems is the ability to couple the physics of the two domains across their interface. Somewhat surprisingly for a framework used for very mature multi-physics application codes, when first starting to investigate simulation of plasma-liquids, MOOSE lacked a straightforward way to interface physics across domains. E.g. one could not set the flux of a specie A on the domain 0 side of an interface equal to the flux of a specie B on the domain 1 side of the interface. If one wanted to ensure continuity of a species flux across an interface, he had no choice but to use the same variable on both domains, which has the unfortunate side-effect for a Continuous Galerkin formulation of also requiring continuity of the species concentration across the interface as well. This condition is of course physically unrealistic in almost all cases; as two examples, hydrophilic H$_2$O$_2$ has six orders of magnitude higher concentration on the liquid side of an interface and hydrophobic NO has two orders of magnitude higher concentration on the gas side of the interface. Thus in order to solve the plasma-liquid equations in a code built on top of MOOSE, the MOOSE framework itself had to be altered to allow creation of residual and Jacobian statements for interfacial conditions like continuity of flux.
+
+MOOSE has several ``systems''; before modification by the author, the systems directly responsible for computing residual contributions from pieces of user governing equations were Kernels (including a few closely related variants like Nodal Kernels and Dirac Kernels), DGKernels (for discontinuous Galerkin computations), constraints, and boundary conditions. The MOOSE constraints system could potentially have been used in a somewhat inelegant way to impose interfacial conditions; however, this would have required at a minimum purchase of an expensive and proprietary commercial meshing package. Instead the author chose to code a brand new MOOSE system called ``Interface Kernels.'' At the time of writing, the implementation of Interface Kernels has required modification or creation of 40 framework files, encompassing the addition or modification of 1,400 lines of code.
+
+As described in \cref{sec:zapdos}, at the core of MOOSE and any application like Zapdos built on top of it is the computation of residual and Jacobian statements (see \cref{eq:Newton}). Adding a new system requires supplying all the code necessary to route the MOOSE framework core residual and Jacobian compute threads to the user provided residual and Jacobian statements. In order to add the new InterfaceKernel system, intelligent decisions about the user interface had to be made. InterfaceKernels resemble most strongly a cross between DGKernels and Integrated Boundary Conditions (IntegratedBCs). DGKernels operate on internal sides of subdomains, providing the user access to solution variable values and gradients at surface interfaces between elements; IntegratedBC's require the user to provide a boundary (or boundaries) to restrict the condition to. InterfaceKernels make use of both of these features: the InterfaceKernel inherits from the DGKernel class, providing InterfaceKernel objects with the ability to access variables on either side of element interfaces, and the BoundaryRestrictable class, allowing the user to specify the internal surfaces on the mesh where the interfacial conditions will live.
+
+After deciding on the user interface for the InterfaceKernel class, the author had to program the MOOSE core residual and Jacobian compute threads to call the respective InterfaceKernel member functions. The stack trace shown in \cref{code:stack} shows the architecture for how InterfaceKernel residuals get called. During application run-time the ThreadedElementLoopBase::operator method is used to loop over elements; it can call both residual and Jacobian threads. \Cref{code:ThreadedElementLoopBase} shows the calls to different geometric objects. The call to onElement computes kernel methods that exist in element volumes; onBoundary calls integrated boundary condition methods that exist on the external sides of the domain; onInternalSide calls discontinuous Galerkin kernels that exist on element sides internal to the domain; finally, the last object call, onInterface, is the call implemented by the author that calls methods for element sides that lie along an interface between subdomains. Both the ComputeResidualThread and ComputeJacobianThread classes are children of the ThreadedElementLoopBase class and must implement the onInterface method that is called by their parent.
+
+\begin{lstlisting}[caption = Stack trace showing the architecture for how InterfaceKernel residuals get called, label = code:stack]
+#0  InterfaceAdvection::computeQpResidual (this=0xf72bf0, type=Moose::Element)
+    at /home/lindsayad/projects/zapdos/src/interfacekernels/InterfaceAdvection.C:56
+#1  0x00007ffff69beae9 in InterfaceKernel::computeElemNeighResidual (this=0xf72bf0,
+    type=Moose::Element) at /home/lindsayad/moose/framework/src/interfacekernels/InterfaceKernel.C:57
+#2  0x00007ffff64463b6 in DGKernel::computeResidual (this=0xf72bf0)
+    at /home/lindsayad/moose/framework/src/dgkernels/DGKernel.C:134
+#3  0x00007ffff67dbd69 in ComputeResidualThread::onInterface (this=0x7fffffffc810, elem=0xd3c570,
+    side=0, bnd_id=2) at /home/lindsayad/moose/framework/src/base/ComputeResidualThread.C:162
+#4  0x00007ffff64b8903 in ThreadedElementLoopBase<libMesh::StoredRange<libMesh::MeshBase::const_element_iterator, libMesh::Elem const*> >::operator() (this=0x7fffffffc810, range=...,
+    bypass_threading=false)
+    at /home/lindsayad/moose/framework/include/base/ThreadedElementLoopBase.h:180
+#5  0x00007ffff67105ca in libMesh::Threads::run_body<libMesh::StoredRange<libMesh::MeshBase::const_element_iterator, libMesh::Elem const*>, ComputeResidualThread> (args=0xffd6f0)
+    at /home/lindsayad/moose/scripts/../libmesh/installed/include/libmesh/threads.h:460
+#6  0x00007ffff66e9cb7 in libMesh::Threads::parallel_reduce<libMesh::StoredRange<libMesh::MeshBase::const_element_iterator, libMesh::Elem const*>, ComputeResidualThread> ()
+    at /home/lindsayad/moose/scripts/../libmesh/installed/include/libmesh/threads.h:658
+#7  0x00007ffff66f587c in libMesh::Threads::parallel_reduce<libMesh::StoredRange<libMesh::MeshBase::const_element_iterator, libMesh::Elem const*>, ComputeResidualThread> (range=..., body=...)
+    at /home/lindsayad/moose/scripts/../libmesh/installed/include/libmesh/threads.h:647
+#8  0x00007ffff66e0ade in NonlinearSystem::computeResidualInternal (this=0xd50f70,
+    type=Moose::KT_ALL) at /home/lindsayad/moose/framework/src/base/NonlinearSystem.C:1220
+#9  0x00007ffff66de473 in NonlinearSystem::computeResidual (this=0xd50f70, residual=...,
+    type=Moose::KT_ALL) at /home/lindsayad/moose/framework/src/base/NonlinearSystem.C:750
+#10 0x00007ffff64a7493 in FEProblem::computeResidualType (this=0xd4e100, soln=..., residual=...,
+    type=Moose::KT_ALL) at /home/lindsayad/moose/framework/src/base/FEProblem.C:3334
+#11 0x00007ffff64a6e33 in FEProblem::computeResidual (this=0xd4e100, soln=..., residual=...)
+    at /home/lindsayad/moose/framework/src/base/FEProblem.C:3270
+#12 0x00007ffff66da9cf in NonlinearSystem::solve (this=0xd50f70)
+    at /home/lindsayad/moose/framework/src/base/NonlinearSystem.C:242
+#13 0x00007ffff64a5ed1 in FEProblem::solve (this=0xd4e100)
+    at /home/lindsayad/moose/framework/src/base/FEProblem.C:3049
+#14 0x00007ffff6c6eff3 in TimeStepper::step (this=0xd77dc0)
+    at /home/lindsayad/moose/framework/src/timesteppers/TimeStepper.C:188
+#15 0x00007ffff6c6049a in Transient::solveStep (this=0xd812b0, input_dt=-1)
+    at /home/lindsayad/moose/framework/src/executioners/Transient.C:413
+#16 0x00007ffff6c5fff2 in Transient::takeStep (this=0xd812b0, input_dt=-1)
+    at /home/lindsayad/moose/framework/src/executioners/Transient.C:340
+#17 0x00007ffff6c5fba9 in Transient::execute (this=0xd812b0)
+    at /home/lindsayad/moose/framework/src/executioners/Transient.C:253
+#18 0x00007ffff66a10be in MooseApp::executeExecutioner (this=0x93c490)
+    at /home/lindsayad/moose/framework/src/base/MooseApp.C:373
+#19 0x00007ffff66a1ec2 in MooseApp::run (this=0x93c490)
+    at /home/lindsayad/moose/framework/src/base/MooseApp.C:523
+#20 0x0000000000420ac6 in main (argc=3, argv=0x7fffffffd078)
+    at /home/lindsayad/projects/zapdos/src/main.C:23
+\end{lstlisting}
+
+\begin{lstlisting}[language = C++, caption = Snapshot of different geometric object calls in ThreadedElementLoopBase::operator, label = code:ThreadedElementLoopBase]
+      onElement(elem);
+
+      for (unsigned int side=0; side<elem->n_sides(); side++)
+      {
+        std::vector<BoundaryID> boundary_ids = _mesh.getBoundaryIDs(elem, side);
+
+        if (boundary_ids.size() > 0)
+          for (std::vector<BoundaryID>::iterator it = boundary_ids.begin(); it != boundary_ids.end(); ++it)
+            onBoundary(elem, side, *it);
+
+        if (elem->neighbor(side) != NULL)
+        {
+          onInternalSide(elem, side);
+          if (boundary_ids.size() > 0)
+            for (std::vector<BoundaryID>::iterator it = boundary_ids.begin(); it != boundary_ids.end(); ++it)
+              onInterface(elem, side, *it);
+        }
+      } // sides
+\end{lstlisting}
+
+\Cref{code:ComputeResidualThread} shows the implementation of the onInterface method in the ComputeResidualThread class. The method takes as arguments the current element, one of the element's sides, and a boundary ID (bnd\_id). The method first checks whether any \_interface\_kernels exist and are active on the boundary specified by bnd\_id. The initialization of \_interface\_kernels will be discussed later. The element's neighbor is accessed using its neighbor method. Currently, the interface kernel system does not support mesh adaptivity; this is checked by comparing neighbor->level() and elem->level() (the level method returns the level of element refinement). After checking whether the neighboring element is active (relevant for transient simulations), a reinitialization of the element face and neighboring face materials is performed. In the most important lines of the method, all of the \_interface\_kernels active on bnd\_id are iterated over, and their individual computeResidual methods are called. The logic for the onInterface method implemented in the ComputeJacobianThread class is very similar to that of ComputeResidualThread.
+
+\begin{lstlisting}[language = C++, caption = ComputeResidualThread::onInterface method. The logic is much the same for the ComputeJacobianThread::onInterface method. , label = code:ComputeResidualThread]
+void
+ComputeResidualThread::onInterface(const Elem *elem, unsigned int side, BoundaryID bnd_id)
+{
+  if (_interface_kernels.hasActiveBoundaryObjects(bnd_id, _tid))
+  {
+
+    // Pointer to the neighbor we are currently working on.
+    const Elem * neighbor = elem->neighbor(side);
+
+    if (!(neighbor->level() == elem->level()))
+      mooseError("Sorry, interface kernels do not work with mesh adaptivity");
+
+    if (neighbor->active())
+    {
+      _fe_problem.reinitNeighbor(elem, side, _tid);
+
+      _fe_problem.reinitMaterialsFace(elem->subdomain_id(), _tid);
+      _fe_problem.reinitMaterialsNeighbor(neighbor->subdomain_id(), _tid);
+
+      const std::vector<MooseSharedPointer<InterfaceKernel> > & int_ks = _interface_kernels.getActiveBoundaryObjects(bnd_id, _tid);
+      for (std::vector<MooseSharedPointer<InterfaceKernel> >::const_iterator it = int_ks.begin(); it != int_ks.end(); ++it)
+        (*it)->computeResidual();
+
+      _fe_problem.swapBackMaterialsFace(_tid);
+      _fe_problem.swapBackMaterialsNeighbor(_tid);
+
+      {
+        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+        _fe_problem.addResidualNeighbor(_tid);
+      }
+    }
+  }
+}
+\end{lstlisting}
+
+The computeResidual method called from ComputeResidualThread :: onInterface is inherited from the DGKernel class. It calls in succession InterfaceKernel :: computeElemNeighResidual(Moose::Element) and InterfacKernel :: computeElemNeighResidual(Moose::Neighbor). The InterfaceKernel :: computeElemNeighResidual method is shown below in \cref{code:InterfaceKernel}. Depending on whether Moose::Element or Moose::Neighbor is passed as the method argument, the space of test functions is taken from the focused element or the neighboring element respectively. The correct residual block, either for \_var in the focused element or \_neighbor\_var in the neighboring element, is similarly determined from the method argument. At the end of the method, we loop over all the quadrature points in the element and add \_JxW[\_qp] * \_coord[\_qp] * computeQpResidual(type) to the i$^{th}$ residual. Here \_JxW represents the quadrature weight, \_coord is a scaling factor for converting from Cartesian to other coordinate systems (e.g. cylindrical or spherical), and computeQpResidual is the residual computed at the quadrature points by the current InterfaceKernel child class.
+
+\begin{lstlisting}[language = C++, caption = The InterfaceKernel :: computeElemNeighResidual method responsible for calling compueQpResidual methods implemented in the various children of the InterfaceKernel class, label = code:InterfaceKernel]
+void
+InterfaceKernel::computeElemNeighResidual(Moose::DGResidualType type)
+{
+  bool is_elem;
+  if (type == Moose::Element)
+    is_elem = true;
+  else
+    is_elem = false;
+
+  const VariableTestValue & test_space = is_elem ? _test : _test_neighbor;
+  DenseVector<Number> & re = is_elem ? _assembly.residualBlock(_var.number()) :
+                                       _assembly.residualBlockNeighbor(_neighbor_var.number());
+
+  for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+    for (_i = 0; _i < test_space.size(); _i++)
+      re(_i) += _JxW[_qp] * _coord[_qp] * computeQpResidual(type);
+
+}
+\end{lstlisting}
+
+An example of a computeQpResidual method implemented in a child class of InterfaceKernel is taken from the InterfaceAdvection class defined in Zapdos. It is shown in \cref{code:computeQpResidual}. The InterfaceAdvection class ensures that all the species being advected from one subdomain flow into the neighboring subdomain. It represents an interfacial condition acting only on the variable living on the focused element; as can be seen from the switch and case logic, no residual contribution is given for the variable living on the neighboring element. Although not relevant for describing the InterfaceKernel system, note that \_r\_units is a data member controlled by the user enabling mesh scaling and improved Jacobian conditioning. As noted previously, species concentration variables are in a logarithmic form such that std::exp(\_neighbor\_value) actually represents the physical concentration of the neighboring specie.
+
+\begin{lstlisting}[language = C++, caption = InterfaceAdvection::computeQpResidual method, label = code:computeQpResidual]
+Real
+InterfaceAdvection::computeQpResidual(Moose::DGResidualType type)
+{
+  Real r = 0;
+
+  switch (type)
+  {
+  case Moose::Element:
+    r = _mu_neighbor[_qp] * _sgn_neighbor[_qp] * -_grad_potential_neighbor[_qp] * _r_neighbor_units * std::exp(_neighbor_value[_qp]) * _normals[_qp] * _test[_i][_qp] * _r_units;
+    break;
+
+  case Moose::Neighbor:
+    r = 0.;
+    break;
+  }
+
+  return r;
+}
+\end{lstlisting}
+
+Interface kernels are read from their own input block in a MOOSE application's input file. An example is shown in \cref{code:interface_input}. The act method in the AddInterfaceKernelAction class calls FEProblem :: addInterfacerKernel which in turn calls NonlinearSystem :: addInterfaceKernel. NonlinearSystem :: addInterfaceKernel adds the interface kernels from the input file to the protected \_interface\_kernels data member which are then accessible to the ComputeResidualThread and ComputeJacobianThread classes through the public accessor method, getInterfaceKernelWarehouse. The details of this initialization process can be found in the source code at \cite{mooseSite}. An important thing to note about interface kernels is that they are uniquely assigned to elements on one side of the interface. Without unique assignment, there could be no organized residual definitions like that shown in \cref{code:computeQpResidual}. Unique assignment is achieved by using libMesh's sideset objects. The block used to create the sideset 'master1\_interface' that is then used to uniquely define the interface kernel of \cref{code:interface_input} is shown in \cref{code:sideset}. Using the built-in SideSetsBetweenSubdomains class, the new sideset is constructed on the block 1 side of the interface.
+
+\begin{lstlisting}[caption = Example of input block for an interface kernel (InterfaceAdvection in this case), label = code:interface_input]
+[InterfaceKernels]
+  [./em_advection]
+    type = InterfaceAdvection
+    mean_en_neighbor = mean_en
+    potential_neighbor = potential
+    neighbor_var = em
+    variable = emliq
+    boundary = master1_interface
+    position_units = ${dom1Scale}
+    neighbor_position_units = ${dom0Scale}
+  [../]
+[]
+\end{lstlisting}
+
+\begin{lstlisting}[caption = Example of how to create a sideset\, in this case 'master1\_interface'\, that can then be used in definition of an interface kernel, label = code:sideset]
+[MeshModifiers]
+  [./interface_again]
+    type = SideSetsBetweenSubdomains
+    master_block = '1'
+    paired_block = '0'
+    new_boundary = 'master1_interface'
+  [../]
+[]
+\end{lstlisting}
+
+Addition of the interface kernel system to the MOOSE framework enables the interfacing of plasma and liquid domains required to obtain the results in \cref{sec:plasliq}. Moreover, the system should be applicable to many other scientific and engineering applications that inherit from the MOOSE framework. In the words of MOOSE founder Derek Gaston: ``Thanks for all this work! To my best knowledge I think this is the first time an external contributor has added a whole new "System" in MOOSE! Definitely a landmark occasion! This is a good one too... LOTS of people will use this for many years to come (including myself!).''
