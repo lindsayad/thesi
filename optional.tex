@@ -1,5 +1,5 @@
 %%  Optional Packages to consider.   These packages are compatible with
-%%    ncsuthesis.  
+%%    ncsuthesis.
 
 %% -------------------------------------------------------------------------- %%
 %% Fancy chapter headings
@@ -9,7 +9,7 @@
 
 %%----------------------------------------------------------------------------%%
 %% Hyperref package creates PDF metadata and hyperlinks in Table of Contents
-%%  and citations.  Based on feedback from the NCSU thesis editor, 
+%%  and citations.  Based on feedback from the NCSU thesis editor,
 %%  the links are not visually distinct from normal text (i.e. no change
 %%  in color or extra boxes).
 \usepackage[
@@ -30,9 +30,9 @@
 %% Microtype - If you use pdfTeX to compile your thesis, you can use
 %%              the microtype package to access advanced typographic
 %%              features.  By default, using the microtype package enables
-%%              character protrusion (placing glyphs a hair past the right 
+%%              character protrusion (placing glyphs a hair past the right
 %%              margin to make a visually straighter edge)
-%%              and font expansion (adjusting font width slightly to get 
+%%              and font expansion (adjusting font width slightly to get
 %%              more favorable justification).
 %%              Using microtype should decrease the number of lines
 %%              ending in hyphens.
@@ -40,10 +40,10 @@
 
 
 %%----------------------------------------------------------------------------%%
-%% Fonts 
+%% Fonts
 
 %% ETD guidelines don't specify the font.  You can enable the fonts
-%%  by uncommenting the appropriate lines.  Using the default Computer 
+%%  by uncommenting the appropriate lines.  Using the default Computer
 %%  Modern fonts is *not* required.  A few common choices are below.
 %%  See http://www.tug.dk/FontCatalogue/ for more options.
 
@@ -54,7 +54,8 @@
 
 %% Utopia
 \usepackage[T1]{fontenc}
-\usepackage[adobe-utopia]{mathdesign}
+%% \usepackage[adobe-utopia]{mathdesign} % This font doesn't have the '*' character available for lstlisting
+\usepackage{lmodern}
 
 %% Palatino
 %\usepackage[T1]{fontenc}
@@ -62,8 +63,8 @@
 %\linespread{1.05}
 
 %% Kerkis
-%\usepackage[T1]{fontenc}
-%\usepackage{kmath,kerkis}
+%% \usepackage[T1]{fontenc}
+%% \usepackage{kmath,kerkis}
 
 %% Times
 %\usepackage[T1]{fontenc}
