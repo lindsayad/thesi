@@ -190,15 +190,15 @@ Zapdos boundary conditions at the cathode are based on the work in \cite{hagelaa
 
 \begin{equation}
   \vec{\Gamma_i}\cdot\vec{n} = \frac{1-r_i}{1+r_i}\left(\left(2a_i-1\right)\mu_i\vec{E}\cdot\vec{n}n_i + \frac{1}{2}v_{th,i}n_i\right)
-  \label{eq:ion_bc}
+  \label{eq:ion_bc_3}
 \end{equation}
 \begin{equation}
     \vec{\Gamma_e}\cdot\vec{n} = \frac{1-r_{dens}}{1+r_{dens}}\left(-\left(2a_e-1\right)\mu_e\vec{E}\cdot\vec{n}\left(n_e-n_{\gamma}\right) + \frac{1}{2}v_{th,e}\left(n_e-n_{\gamma}\right)\right) - \left(1-a_e\right)\gamma_p\vec{\Gamma_p}\cdot\vec{n}
-  \label{eq:electron_bc}
+  \label{eq:electron_bc_3}
 \end{equation}
 \begin{equation}
     \vec{\Gamma_{\epsilon}}\cdot\vec{n} = \frac{1-r_{en}}{1+r_{en}}\left(-\left(2a_e-1\right)\frac{5}{3}\mu_e\vec{E}\cdot\vec{n}\left(n_e\epsilon-n_{\gamma}\epsilon_{\gamma}\right) + \frac{5}{6}v_{th,e}\left(n_e\epsilon-n_{\gamma}\epsilon_{\gamma}\right)\right) - \frac{5}{3}\epsilon_{\gamma}\left(1-a_e\right)\gamma_p\vec{\Gamma_p}\cdot\vec{n}
-  \label{eq:energy_bc}
+  \label{eq:energy_bc_3}
 \end{equation}
 
 where $r_i$, $r_{dens}$, $r_{en}$ are the boundary reflection coefficients for ions, electrons, and electron energy respectively (more discussion on $r_{en}$ shortly), $\gamma_p$ is the secondary electron emission coefficient, $\epsilon_{\gamma}$ is the energy of the secondary electrons, $\vec{n}$ is the outward facing normal vector, and:
@@ -209,36 +209,36 @@ where $r_i$, $r_{dens}$, $r_{en}$ are the boundary reflection coefficients for i
       1, & sgn_k\mu_k\vec{E}\cdot\vec{n}>0 \\
       0, & sgn_k\mu_k\vec{E}\cdot\vec{n}\leq0
     \end{cases}
-  \label{eq:a}
+  \label{eq:a_3}
 \end{equation}
 \begin{equation}
   v_{th,k} = \sqrt{\frac{8T_k}{\pi m_k}}
-  \label{eq:v_th}
+  \label{eq:v_th_3}
 \end{equation}
 \begin{equation}
   n_{\gamma} = \left(1-a_e\right)\frac{\gamma_p\vec{\Gamma_p}\cdot\vec{n}}{\mu_e\vec{E}\cdot\vec{n}}
-  \label{eq:n_gamma}
+  \label{eq:n_gamma_3}
 \end{equation}
 
 where $v_{th,k}$ is the thermal velocity of species $k$ and $n_{\gamma}$ is the density of secondary electrons. A thermodynamic interfacial condition is also available:
 
 \begin{equation}
   Hn_{e,g} = n_{e,l}
-  \label{eq:electron_bc_thermo}
+  \label{eq:electron_bc_thermo_3}
 \end{equation}
 
 For ions and electrons in the liquid phase, depending on the polarity of the discharge, a simple outflow BC is used at the counter electrode at the bottom of the liquid. Its strong form is:
 
 \begin{equation}
   \vec{\Gamma_k}\cdot\vec{n} = -a_k \mu_k \sgn(q_k) e^{N_k} \nabla V \cdot \vec{n}
-  \label{eq:outflow}
+  \label{eq:outflow_3}
 \end{equation}
 
 For potential conditions, grounding is done using a DirichletBC class inherited from MOOSE. The other boundary condition incorporates an external ballast resistor:
 
 \begin{equation}
   V_{source} + V_{cathode} = \left(e\vec{\Gamma_i} - e\vec{\Gamma_e}\right)AR
-  \label{eq:cathode}
+  \label{eq:cathode_3}
 \end{equation}
 
 A summary of the important boundary condition classes that Zapdos defines are summarized in \cref{tab:bcs}.
@@ -257,12 +257,12 @@ A summary of the important boundary condition classes that Zapdos defines are su
     \label{tab:bcs}
     \endlastfoot
 
-    HagelaarIonBC & \cref{eq:ion_bc} & Kinetic ion boundary condition\\\hline
-    HagelaarElectronBC & \cref{eq:electron_bc} & Kinetic electron boundary condition\\\hline
-    HagelaarEnergyBC & \cref{eq:energy_bc} & Kinetic electron energy boundary condition\\\hline
-    DCIonBC & \cref{eq:outflow} & Electric field driven outflow boundary condition\\\hline
-    NeumannCircuitVoltageMoles\_KV & \cref{eq:cathode} & Circuit boundary condition for potential\\\hline
-    MatchedValueLogBC & \cref{eq:electron_bc_thermo} & Henry's Law like thermodynamic boundary condition for specifying a specie concentration ratio at the gas-liquid interface\\\hline
+    HagelaarIonBC & \cref{eq:ion_bc_3} & Kinetic ion boundary condition\\\hline
+    HagelaarElectronBC & \cref{eq:electron_bc_3} & Kinetic electron boundary condition\\\hline
+    HagelaarEnergyBC & \cref{eq:energy_bc_3} & Kinetic electron energy boundary condition\\\hline
+    DCIonBC & \cref{eq:outflow_3} & Electric field driven outflow boundary condition\\\hline
+    NeumannCircuitVoltageMoles\_KV & \cref{eq:cathode_3} & Circuit boundary condition for potential\\\hline
+    MatchedValueLogBC & \cref{eq:electron_bc_thermo_3} & Henry's Law like thermodynamic boundary condition for specifying a specie concentration ratio at the gas-liquid interface\\\hline
   \end{longtable}
 \end{ThreePartTable}
 

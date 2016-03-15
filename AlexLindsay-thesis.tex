@@ -231,11 +231,6 @@
 \usepackage{placeins}
 %De­fines a \FloatBar­rier com­mand, be­yond which floats may not pass; use­ful, for ex­am­ple, to en­sure all floats for a sec­tion ap­pear be­fore the next \sec­tion com­mand.
 
-%%%Hack for centering all figures
-%\makeatletter
-%\g@addto@macro\@floatboxreset\centering
-%\makeatother
-
 %%----------------------------------------------------------------------------%%
 %%---------------------------- Formatting Options ----------------------------%%
 %%----------------------------------------------------------------------------%%
@@ -370,6 +365,8 @@
 \renewcommand{\listfigurename}{LIST OF FIGURES}
 \renewcommand{\listtablename}{LIST OF TABLES}
 \renewcommand{\bibname}{BIBLIOGRAPHY}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
 
 %\renewcommand{\cfttoctitlefont}{\centering\ncsu@headingformat}
 
@@ -400,10 +397,12 @@
 \renewcommand{\footrulewidth}{0pt}
 }
 
+\renewcommand{\familydefault}{\rmdefault}
 
 \begin{document}
 \sloppy
 \pagestyle{plain}
+
 %%---------------------------------------------------------------------------%%
 \frontmatter
 

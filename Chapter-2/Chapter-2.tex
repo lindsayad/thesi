@@ -1,10 +1,20 @@
 \chapter{BASIC SCIENCE OF PLASMA-LIQUID SYSTEMS}
 \label{chap:basic_science}
 
+\Cref{chap:intro} outlined a few fundamental questions in plasma-liquids that had yet to be explored. These included:
+
+\begin{itemize}
+\item What's the role of convection in transport processes between plasma and liquid phases for discharges like coronas and jets?
+\item How does varying interfacial parameters like the electron surface loss coefficient affect important plasma-liquid variables?
+\item Why does decreasing solution conductivity increase the spreading of discharges over the liquid surface?
+\end{itemize}
+
+The role of convection is investigated in \cref{sec:plasfree_model}. Influence of interfacial parameters is considered in \cref{sec:plasliq}. While not explored in this dissertation, \cref{sec:plasliq} lays much needed groundwork for answering the third fundamental question of solution conductivity and discharge spreading.
+
 \section{Momentum, Heat, and Neutral Mass Transport}
 \label{sec:plasfree_model}
 
-For a published version of much of the transport modelling work described below, the author encourages the interested reader to navigate to \cite{lindsay2015momentum}.
+For a published version of much of the transport modelling work described in \cref{sec:plasfree_model}, the author encourages the reader to navigate to \cite{lindsay2015momentum}.
 
 \subsection{Model Description}
 
@@ -18,7 +28,7 @@ The convective system chosen for modelling is shown in \cref{fig:streamer_pictur
     \label{fig:streamer_picture}
 \end{figure}
 
-We have chosen not to explicitly model the atmospheric discharge due to the computational cost of modeling of gas-liquid interfacial transport over time-scales of minutes (the equivalent of millions of individual pulses). In the future we plan to model a single plasma pulse and use mass fractions of plasma produced species as inputs to the model presented here; however, this self-consistent coupling is still under development. Instead, gas phase concentrations of the species modeled are taken from the DBD-water calculations in \cite{Tian2014} and diluted by a factor of 10; the gas phase species included and their respective inlet concentrations are shown in table \ref{tab:inletconc}. The factor 10 dilution is done for numerical stability.  High concentrations of reactive oxygen and nitrogen species (RONS) at the interface combined with very fast rate coefficients, particularly for reactions involving OH, can lead to singularities over our time scales of interest unless the computational mesh is sufficiently refined, requiring significant computational power. All concentration results and discussion will be focused on relative magnitudes and variation with space and time. The results in \cite{Tian2014} are chosen as an input basis because of the absence of experimental work for atmospheric plasmas in which a suite of gas-phase plasma species concentrations are reported. Most of the measurements in the literature focus on single species like OH \cite{ono1998measurement,ono2001oh,nakagawa2011density,verreycken2012time}, atomic oxygen \cite{niemi2005absolute}, or NO \cite{kanazawa2003two} that are accessible through Laser Induced Fluorescence (LIF).
+For the work in \cref{sec:plasfree_model}, we have chosen not to explicitly model the atmospheric discharge due to the computational cost of modeling of gas-liquid interfacial transport over time-scales of minutes (the equivalent of millions of individual pulses) using Comsol's seemingly inefficient plasma module. Instead, gas phase concentrations of the species modeled are taken from the DBD-water calculations in \cite{Tian2014} and diluted by a factor of 10; the gas phase species included and their respective inlet concentrations are shown in table \ref{tab:inletconc}. The factor 10 dilution is done for numerical stability.  High concentrations of reactive oxygen and nitrogen species (RONS) at the interface combined with very fast rate coefficients, particularly for reactions involving OH, can lead to singularities over our time scales of interest unless the computational mesh is sufficiently refined, requiring significant computational power. All concentration results and discussion will be focused on relative magnitudes and variation with space and time. The results in \cite{Tian2014} are chosen as an input basis because of the absence of experimental work for atmospheric plasmas in which a suite of gas-phase plasma species concentrations are reported. Most of the measurements in the literature focus on single species like OH \cite{ono1998measurement,ono2001oh,nakagawa2011density,verreycken2012time}, atomic oxygen \cite{niemi2005absolute}, or NO \cite{kanazawa2003two} that are accessible through Laser Induced Fluorescence (LIF).
 
 A key feature of streamer discharges is the ionic wind. The ionic wind is a net flow of gas towards the cathode that results from the effective drag of cations on neutral gas molecules. In the streamer-liquid system studied, the ionic wind creates convective forces that affect species transport at the gas-liquid interface. Since the discharge is not modelled, another mechanism must be used to produce the ionic wind present in a streamer discharge. The mechanism chosen is a jet-like inlet with diameter equal to the diameter of the needle used in the experimental streamer set-up. The velocity profile at the inlet of the jet flow development channel is chosen such that the channel exit profile closely mimics that expected from streamer experiments and modeling. \cite{Zhao2005a} The profile is built from the expected streamer maximum axial velocity which is in turn determined from the work of Zhao et. al. Using values of 6 kV for the discharge voltage and 6.5 mm for the gap distance, the maximum axial velocity is interpolated to be 7.75 m/s near the needle tip. The spatial inlet profile is then computed from \cref{eq:v_in} assuming laminar no-slip conditions in the inlet channel: \cite{bird2007transport}
 
@@ -67,9 +77,9 @@ where Q$_b$ is the heat flux, J$_{z,H_2O}$ is the molar flux of H$_2$O coming fr
     \label{eq:Antoine}
 \end{equation}
 
-with p in units of mmHg, T in units of degrees Celsius, and the constant values taken from \cite{dimian2014integrated}.  The temperature at the gas inlet is set to 300 K for all times. Initially the temperature in both gas and liquid domains is 300 K. Inlet concentrations for species other than water vapor are specified at the beginnning of the jet flow development channel and are given in \cref{tab:inletconc}. Dilute species that are present in both gas and aqueous phases (OH, H$_2$O$_2$, NO, NO$_2$, N$_2$O$_4$, HNO$_2$, and HNO$_3$) have continuous fluxes across the gas-liquid interface. Concentrations immediately above and below the interface are assumed to be in equilibrium as described by their Henry's law coefficients, listed in \cref{tab:henryconstants}. A limited set of gas and liquid phase reactions encompassing the most important NO$_x$ chemistry is used to reduce computational expense. Even with this simplified reaction set and diluted concentration inputs, the simulation takes multiple days on a quad-core desktop and approaches 16 GB in required memory. As we develop parallel computing software and hardware capabilities and streamline simulation techniques, we plan to incorporate a more complete set of reacting species and reactions.  Some important species that were not included in this simplified set include oxygen and hydrogen radicals as well as water cluster ions to name a few. The reactions used in this study and their corresponding rate coefficients are listed in \cref{tab:rxns}. It should be noted that because of its highly acidic nature (pKa ~ -1.3), HNO$_3$ is assumed to dissociate into H$^+$ and NO$_3^-$ immediately after entering the aqueous phase. The model equations are solved using the finite element method implemented in Comsol Multiphysics version 4.4. A copy of the model is freely available upon request.
+with p in units of mmHg, T in units of degrees Celsius, and the constant values taken from \cite{dimian2014integrated}.  The temperature at the gas inlet is set to 300 K for all times. Initially the temperature in both gas and liquid domains is 300 K. Inlet concentrations for species other than water vapor are specified at the beginnning of the jet flow development channel and are given in \cref{tab:inletconc}. Dilute species that are present in both gas and aqueous phases (OH, H$_2$O$_2$, NO, NO$_2$, N$_2$O$_4$, HNO$_2$, and HNO$_3$) have continuous fluxes across the gas-liquid interface. Concentrations immediately above and below the interface are assumed to be in equilibrium as described by their Henry's law coefficients, listed in \cref{tab:henryconstants}. A limited set of gas and liquid phase reactions encompassing the most important NO$_x$ chemistry is used to reduce computational expense. Even with this simplified reaction set and diluted concentration inputs, the simulation takes multiple days on a quad-core desktop and approaches 16 GB in required memory. As we move towards a more parallelizable software framework (see \cref{sec:plasliq} and \cref{chap:zapdos}), we plan to incorporate a more complete set of reacting species and reactions.  Some important species that were not included in this simplified set include oxygen and hydrogen radicals as well as water cluster ions to name a few. The reactions used in this study and their corresponding rate coefficients are listed in \cref{tab:rxns}. It should be noted that because of its highly acidic nature (pKa ~ -1.3), HNO$_3$ is assumed to dissociate into H$^+$ and NO$_3^-$ immediately after entering the aqueous phase. The model equations are solved using the finite element method implemented in Comsol Multiphysics version 4.4. A copy of the model is freely available upon request.
 
-When the ``discharge region" is discussed, it is in reference to the gas region roughly demarcated in the z direction by the jet outlet/needle anode and the water surface, and in the radial direction by the radius of the jet channel/needle, where the plasma is visible during experiments. The reader is reminded that the plasma and its electrodynamics are not explicitly modeled; the focus of this investigation is the qualitative behavior of momentum, heat, and neutral species mass transport in convective systems. The qualitative conclusions drawn here are equally applicable to atmospheric jets or streamer systems in which the ionic wind plays a key role in momentum transport. Moreover, we postulate that the steep gradients in highly reactive neutral species concentrations at the gas-liquid interface shown in the proceeding section are a universal phenomena of atmospheric plasma-liquid systems, regardless of whether they are convective or diffusive; this is consistent with the recent research by \cite{Chen2014a} as well as the greater reservoir of biochemistry literature \cite{Halliwell}. Morever, these gradients have important implications for plasma medicine, mainly that cellular responses must be induced through secondary as opposed to directly generated plasma reactivity.
+When the ``discharge region" is discussed, it is in reference to the gas region roughly demarcated in the z direction by the jet outlet/needle anode and the water surface, and in the radial direction by the radius of the jet channel/needle, where the plasma is visible during experiments. The reader is reminded that the plasma and its electrodynamics are not explicitly modeled in \cref{sec:plasfree_model}; the focus of this investigation is the qualitative behavior of momentum, heat, and neutral species mass transport in convective systems. The qualitative conclusions drawn here are equally applicable to atmospheric jets or streamer systems in which the ionic wind plays a key role in momentum transport. Moreover, we postulate that the steep gradients in highly reactive neutral species concentrations at the gas-liquid interface shown in the proceeding section are a universal phenomena of atmospheric plasma-liquid systems, regardless of whether they are convective or diffusive; this is consistent with the recent research by \cite{Chen2014a} as well as the greater reservoir of biochemistry literature \cite{Halliwell}. Morever, these gradients have important implications for plasma medicine, mainly that cellular responses must be induced through secondary as opposed to directly generated plasma reactivity.
 
 \begin{figure}[htb]
     \centering
@@ -342,7 +352,21 @@ To study this, we constructed a 1D model of just the liquid phase, neglecting li
 
 On a related note, the 1D model can be used to analyze the effect of the uniform dilution factor used in the 2D-axisymmetric model on the penetration distance of radicals. From the species mass conservation equations we expect penetration distances to decrease as input concentrations are scaled up since the only non-linear terms are reaction sinks. More precisely, the dimensionless Damkohler number, $Da=\frac{kCL^2}{D}$, for a second-order reaction-diffusion problem shows that the penetration distance will scale like $\frac{1}{\sqrt{C}}$. \cite[p. 55]{deen1998analysis} This hypothesis is confirmed by the 1D model. When the interfacial concentrations from the 2D-axisymmetric model are input directly into the 1D model, OH and NO penetration distances are 18 and 15 microns respectively. These are almost exactly a factor of $\sqrt{10}$ greater than the 5.8 and 4.7 $\mu$m penetration distances seen when the concentration inputs are scaled up by 10. If the concentrations are increased more, the penetration distances are even further reduced, following the scaling of $\frac{1}{\sqrt{C}}$. These analyses of the radical concentration profiles support one of our main arguments: though the amount and type of species present at the plasma-liquid interface may vary between discharge types, most of the plasma generated reactivity will likely lie within a small interfacial region, microns to a couple hundred microns, regardless of the experimental configuration.
 
-Before concluding, it is worth touching on the assumption of a flat interface. This work discusses the role gas phase convection plays in determining momentum, heat, and mass transport across a gas-liquid interface and into the bulk liquid. Species uptake is used as the criteria for determining whether to include self-consistent deformation of the interface by the gas flow. To make this determination, the shape of the interface deformation was observed experimentally and the deformation was introduced into the model geometry as shown in figure \ref{fig:deformed_geom}. The depth of the deformation was supported by a calculation balancing gravitational ($\rho$gh) and convective ($\frac{1}{2}\rho$v$^2$) stresses. The fluid flow simulation was then run until it reached stead-state, and then the heat and mass transfer equations were solved. In this way, though the interface deformation was not self-consistently determined, its influence on variables of interest could be analyzed. Shown in \ref{fig:NO_deform_compare} is the effect of the interface deformation on total solution uptake of NO(aq). As can be seen in the figure, the effect is minute. Because of the characteristics shown in Figure \ref{fig:excel}, the effect of the interface deformation on hydrophilic species transport is expected to be even less. Subsequently, for the purpose of this work, the interface deformation can be safely neglected.
+Returning to the 2D model, we can introduce a dissolved marker like Tyrosine into solution and observe its degradation via reactive plasma species and predict product formation for potential future validation with experiments. \Cref{fig:tyr_conc} shows the concentration profile of tyrosine after fifteen minutes of exposure to reactive plasma species. The origin represents the stagnation point or the point at which the center of the plasma column impinges on the liquid surface. Z = 0 represents the water surface. After treatment, the concentration of tyrosine at the surface has been roughly cut in half. The presence of bulk liquid advection is evident in the decreased tyrosine concentration surrounding a local maximum at roughly (.01, -.0015). We can also look at the volume-averaged concentrations of tyrosine products in \cref{fig:tyr_products}. TyrDot is tyrosine radical, diTyr is dityrosine, TyrNO is tyrosine with an added NO functional group, TyrNO2 has an added NO$_2$ functional group, and TyrOHo and TurOHm are tyrosine with an additional OH functional group at the ortho- and meta- positions respectively. Our model predicts that dityrosine will be the dominant terminal specie with TyrOHm and TyrDot representing important reactive intermediates.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=\textwidth]{tyrosine_products.png}
+    \caption{Plot vs. time showing the growth of different tyrosine products. The dominant product formed is dityrosine.}
+    \label{fig:tyr_products}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=\textwidth]{tyrosine_conc.png}
+    \caption{Plot of tyrosine concentration at the end of 15 minutes of reactive species exposure. Concentration is significantly depleted near the liquid surface as well as within the advective re-circulating loop.}
+    \label{fig:tyr_conc}
+\end{figure}
 
 \begin{figure}[htb]
     \centering
@@ -358,80 +382,29 @@ Before concluding, it is worth touching on the assumption of a flat interface. T
     \label{fig:NO_deform_compare}
 \end{figure}
 
-\subsection{Conclusion}
+Before concluding, it is worth touching on the assumption of a flat interface. This work discusses the role gas phase convection plays in determining momentum, heat, and mass transport across a gas-liquid interface and into the bulk liquid. Species uptake is used as the criteria for determining whether to include self-consistent deformation of the interface by the gas flow. To make this determination, the shape of the interface deformation was observed experimentally and the deformation was introduced into the model geometry as shown in figure \ref{fig:deformed_geom}. The depth of the deformation was supported by a calculation balancing gravitational ($\rho$gh) and convective ($\frac{1}{2}\rho$v$^2$) stresses. The fluid flow simulation was then run until it reached stead-state, and then the heat and mass transfer equations were solved. In this way, though the interface deformation was not self-consistently determined, its influence on variables of interest could be analyzed. Shown in \ref{fig:NO_deform_compare} is the effect of the interface deformation on total solution uptake of NO(aq). As can be seen in the figure, the effect is minute. Because of the characteristics shown in Figure \ref{fig:excel}, the effect of the interface deformation on hydrophilic species transport is expected to be even less. Subsequently, for the purpose of this work, the interface deformation can be safely neglected.
 
-A qualitative study of the momentum, heat, and mass transport in a convective plasma-liquid system has been conducted. Several interesting results were found. Convective flow of water vapor away from the interface leads to a sharp temperature gradient between the bulk gas and liquid phases. This sharp gradient is important for accurately determining temperature-dependent rate coefficients in both the gas and liquid phases. Additionally, convection drives water vapor away from the discharge region except immediately above the liquid surface; this could have important consequences for gas-phase generation of reactive species that depend on water as a precursor. Induced convection in the liquid phase substantially changes the spatial distribution of aqueous species and increases the volume-averaged uptake of hydrophobic species but interestingly has little effect on the volume-averaged uptake of hydrophilic species. This phenomena occurs because the majority of resistance to interfacial transfer is in the gas phase for hydrophilic species and in the liquid phase for hydrophobic species; consequently, decreasing the liquid-phase mass transfer resistance by adding liquid convection has a significant impact for hydrophobic but not for hydrophilic molecules.
+Though comprehensive in many respects, the model in this section is not near complete without simulation of plasma discharge physics. Incorporating discharge physics requires changing simulation platforms from Comsol to Zapdos, a highly customizable code built by the authors where near total control over solution of the highly-nonlinear plasma equations is maintained. Zapdos is described in detail in \cref{chap:zapdos}. The 1D simulation effort in \cref{sec:plasliq} are the authors' first foray into self-consistent discharge-liquid modelling. Along with exploring questions about interfacial parameters, the work in \cref{sec:plasliq} is absolutely necessary for extending the work in this section. Combining the two modelling efforts is definitely on the roadmap for future work.
 
-Perhaps the most interesting result of the study is the sharp distinction between reactivity at the surface and in the liquid bulk. Though the limited penetration (tens of $\mu$m or less) of reactive neutral radicals is well publicized in prominent biochemistry texts like \cite{Halliwell}, this phenomena has yet to receive significant attention in the plasma-liquid literature with the exception of \cite{Chen2014a}. Concentrations of species of interest for plasma-medicine and other applications (e.g. OH, NO, ONOOH) fall by as many as 9 orders of magnitude within 50 $\mu$m of the interface. In a relatively pure aqueous solution as is modeled here, the process responsible for conveying plasma reactivity to a target may be transport of H$_2$O$_2$ and acidified nitrite followed by a close-proximity reaction to form ONOOH and then OH and NO$_2$. For targets in aqueous biological systems, the conveyors of reactivity may be proteins modified by primary plasma species. What can be stated from the results presented here and in \cite{Chen2014a} is that these conveyors of plasma reactivity are probably not neutral radicals generated directly by the plasma; rather they are likely species generated by secondary reactions in the aqueous medium or more stable compounds like H$_2$O$_2$ and nitrite. To address this problem with even greater precision and detail, future research will involve developing a configuration-specific plasma and electrodynamics model that can be self-consistently coupled to the momentum, heat, and neutral species mass transport presented in this study.
+\FloatBarrier
 
 \section{Fully Coupled Simulation of the Plasma Liquid Interface and Interfacial Coefficient Effects}
 \label{sec:plasliq}
 
+\subsection{Model Description}
+\label{sec:model}
+\input{Chapter-2/model_description.tex}
+\FloatBarrier
+
 \subsection{Results and Discussion}
 \label{sec:plasliq_results}
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{ElectronDensityBothDomains.eps}
-  \caption{Electron density as a function of the interfacial surface loss coefficient}
-  \label{fig:electrons}
-\end{figure}
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{kinetic_vary_gamma_dens_only_em_lin.eps}
-  \caption{Electron density as a function of the interfacial surface loss coefficient. Final 20 $\mu$m of the gas phase before the interface.}
-  \label{fig:electrons_int}
-\end{figure}
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{ElectronDensityHenryBC.eps}
-  \caption{Electron density as a function of $H$ using the thermodynamic boundary condition. Shows same trend as \cref{fig:electrons}}
-  \label{fig:electrons_thermo}
-\end{figure}
-
-\Cref{fig:electrons} shows the electron density in both the gas and liquid phases as a function of the interfacial surface loss coefficient. The cathode and bulk profiles are unaffected by changing $\gamma_{dens}$. However, as one might expect, decreasing the surface loss coefficient leads to a build-up of electrons on the gas phase side of the interface, seen more clearly in \cref{fig:electrons_int}. Similar behavior can be achieved by decreasing the $H$ coefficient from \cref{eq:electron_bc_thermo}. In order to observe anode characteristics akin to those for a plasma in contact with a metallic electrode ($\gamma_{dens}=1$), $H$ must be on the order of $10^6$. This is on the same order of magnitude as Henry's Law coefficients for H$_2$O$_2$ and HNO$_3$, both very hydrophilic species. If $H$ is reduced to $10^4$, the gas phase electron density near the interface increases by an order of magnitude. If $H$ is further reduced to $10^2$, only slightly less hydrophilic than OH, then the gas phase interfacial density rockets up to three orders of magnitude greater than the metallic anode base case. Decreasing $H$ further only continues the trend.
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{plasliq_potential_gammadens.eps}
-  \caption{Potential as a function of the interfacial surface loss coefficient}
-  \label{fig:potential}
-\end{figure}
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{dummy_Efield.eps}
-  \caption{Electric field near the interface as a function of the interfacial surface loss coefficient}
-  \label{fig:efield_int}
-\end{figure}
-
-Despite the dramatic functional dependence of the gas phase electron density in the anode, the liquid phase electron density profile remains unchanged as $\gamma_{dens}$ is varied. The reason for this can be seen by looking at \cref{fig:potential}. Like the liquid phase electron density profile, the potential drop across the plasma-liquid system is unaffected by changing $\gamma_{dens}$. This means that the system DC current is also unaffected. Away from the cathode, all the current is carried by electrons, thus the electron current at the interface between the gas and liquid must also remain unchanged as $\gamma_{dens}$ is varied. With the liquid phase electron input thus unaffected by $\gamma_{dens}$, the liquid phase electron density profile remains constant. Varying $\gamma_{dens}$ does change the potential and electric field profiles near the interface; this is shown in \cref{fig:efield_int}. From the low reflection to high reflection extremes, the interfacial electric field increases by about a factor of seven.
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{plasliq_idens_gammadens.eps}
-  \caption{Ion density as a function of the interfacial surface loss coefficient}
-  \label{fig:ions}
-\end{figure}
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{plasliq_etemp_gammadens.eps}
-  \caption{Electron temperature as a function of the interfacial surface loss coefficient}
-  \label{fig:e_temp}
-\end{figure}
-
-As with the electron density, the cathode and bulk electron temperature profiles in \cref{fig:e_temp} do not change as $\gamma_{dens}$ is varied. However, there is major variation in the anode. This variation arises from the assumption described in the model description section that electrons coming from the bulk either carry their energy into the liquid phase upon absorption or else if reflected lose their energy through interfacial surface collisions. The greater the reflection, the lower the average energy of electrons near the interface because of non-recombinatory surface collisions. This is what is observed in \cref{fig:e_temp}. This trend in electron energy also explains the slight variation in anode ion density profiles seen in \cref{fig:ions}. Lower electron mean energy near the interface means a smaller fraction of electrons with sufficient energy to create ionization and a smaller Townsend ionization coefficient. Because in this model ionization is proportional to the electron flux magnitude and because the electron flux magnitude is constant with respecto to $\gamma_{dens}$, the decrease in $\alpha_{iz}$ corresponds to a decrease in the rate of ionization. Hence the ion density rises to its bulk value farther from the anode for decreasing $\gamma_{dens}$.
-
-These trends in the anode electron density and electron temperature at the anode could play an important role in more complex models that consider evaporation of H$_2$O and dilute aqueous species. The rates of reactions of electrons with these species will depend strongly on the electron density and the electron energy distribution. Different energy distributions might favor vibrational excitation of H$_2$O or dissociative attachment and the production of electronegative plasma species like O$^-$ and OH$^-$. The near interface gas chemistry will of course couple back into the liquid phase chemistry. Future work with more complex models will investigate how changing $\gamma_{dens}$ affects plasma and liquid chemistry. However, in order to limit the scope of possible results and increase the predictive capability of such models, there must be more certainty in interfacial parameters like $\gamma_{dens}$. Determination of such characteristics will likely require finer scale simulations (molecular dynamics for instance) and/or new experimental diagnostics that are capable of probing near-interface gas dynamics.
+\input{Chapter-2/results_discussion.tex}
 
 % Figures to add text for:
 
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=.8\textwidth]{dummy_PowerDep_em.eps}
+  \includegraphics[width=.75\textwidth]{dummy_PowerDep_em.eps}
   \caption{Power deposited in electrons near the interface as a function of the interfacial surface loss coefficient}
   \label{fig:powerDep_em_int}
 \end{figure}
@@ -440,44 +413,53 @@ These trends in the anode electron density and electron temperature at the anode
 
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=.8\textwidth]{InterfacialChargeDensity.eps}
+  \includegraphics[width=.75\textwidth]{InterfacialChargeDensity.eps}
   \caption{Charge density near the interface as a function of the interfacial surface loss coefficient}
   \label{fig:charge_dens_int}
 \end{figure}
 
-
-
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=.8\textwidth]{ElectronIonPowerDepFullGasDomain.eps}
+  \includegraphics[width=.75\textwidth]{ElectronIonPowerDepFullGasDomain.eps}
   \caption{Power deposited in ions and electrons over the whole gas domain for low and high reflection cases}
   \label{fig:powerDep_em_Arp_full}
 \end{figure}
 
+Power deposition into both electrons and ions for the cases of $\gamma_{dens}=1$ and $\gamma_{dens}=10^{-4}$ are shown in \cref{fig:powerDep_em_Arp_full}. Ion power deposition profiles are identical between the different reflection cases. As expected for a DC discharge, all of the ion power deposition occurs in the cathode fall where both the electric field and ion current are significantly higher than in the bulk. Electron heating occurs throughout the discharge with local maxima in both the cathode and anode regions.
+
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=.8\textwidth]{RateProcesses.eps}
+  \includegraphics[width=.75\textwidth]{RateProcesses.eps}
   \caption{Rate of ionization, excitation, and elastic collisions in the plasma for low and high reflection cases}
   \label{fig:rateProc}
 \end{figure}
 
+\Cref{fig:rateProc} shows the rate of elastic, excitation, and ionization collisions in the discharge. Elastic collision rates show an inverse relationship to the electron temperature: in the cathode where the electron temperature peaks, the elastic collision rate crashes; in the anode for the high reflection case ($\gamma_{dens}=10^{-4}$) the elastic collision rate peaks sharply because of the sharp fall in the electron temperature. Excitation collision rates are uniform through the bulk of the discharge for both high and low reflecion cases. Ionization rates peak in the bulk-sheath interface regions where the electron temperature is highest. Both excitation and ionization rates collapse in the cathode where electrons have not had sufficient time to gain energy; for high electron reflection the excitation and ionization rates also collapse in the anode.
+
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=.8\textwidth]{Currents.eps}
+  \includegraphics[width=.75\textwidth]{Currents.eps}
   \caption{Plot of specie and total currents in gas and liquid phases for low and high reflection cases}
   \label{fig:currents}
 \end{figure}
 
+\Cref{fig:currents} is a somewhat busy figure. It illustrates the currents carried by different species in gas and liquid phases as well as the total current. Dotted lines indicate the total current, solid lines the electron current, and dashed lines the argon and hydroxyl currents in the gas and liquid phases respectively. The curves do not show a strong functional dependence on the surface loss coefficient $\gamma_{dens}$. Current is carried by argon ions in the cathode, transitioning to electrons in the gas bulk and through the gas-liquid interface. As electrons react with water molecules, OH$^-$ becomes the dominant liquid current carrier away from the interface.
+
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=.8\textwidth]{ElectronFluxesBothDomains.eps}
+  \includegraphics[width=.75\textwidth]{ElectronFluxesBothDomains.eps}
   \caption{Breakdown of electron diffusive and advective fluxes in both domains for low and high reflection cases}
   \label{fig:electron_fluxes}
 \end{figure}
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=.8\textwidth]{AllDensitiesBothDomains.eps}
-  \caption{Specie densities in both domains for low and high reflection cases}
-  \label{fig:densities}
-\end{figure}
+Electron total, advective, and diffusive fluxes are illustrated in \cref{fig:electron_fluxes}. Consistent with \cref{fig:currents}, the total electron current rises from zero at the cathode to a constant value that it maintains through the gas bulk to the interface. The total current declines in the liquid phase because of electron reactions with H$_2$O. Advection and diffusion flux profiles are very similar between high and low reflection cases with the exception of the behavior very near the gas-liquid interface. Advective flux builds in the cathode until reaching a peak at the sheath-bulk interface. The advective flux then gradually declines in the bulk because of a gradual decrease in the bulk electric field until plummeting sharply in the anode as the electron density plummets; however, for the high reflection case very near the gas-liquid interface the advective flux rebounds sharply. This counter-acts the very strong leftward diffusive flux that arises from the large build-up in electron concentration. The net effect is that the total electron flux remains constant.
+
+\section{Summary}
+
+This chapter addresses a couple of fundamental questions regarding plasma-liquids. A qualitative study of the momentum, heat, and mass transport in a convective plasma-liquid system has been conducted in \cref{sec:plasfree_model}. Several interesting results were found. Convective flow of water vapor away from the interface leads to a sharp temperature gradient between the bulk gas and liquid phases. This sharp gradient is important for accurately determining temperature-dependent rate coefficients in both the gas and liquid phases. Additionally, convection drives water vapor away from the discharge region except immediately above the liquid surface; this could have important consequences for gas-phase generation of reactive species that depend on water as a precursor. Induced convection in the liquid phase substantially changes the spatial distribution of aqueous species and increases the volume-averaged uptake of hydrophobic species but interestingly has little effect on the volume-averaged uptake of hydrophilic species. This phenomena occurs because the majority of resistance to interfacial transfer is in the gas phase for hydrophilic species and in the liquid phase for hydrophobic species; consequently, decreasing the liquid-phase mass transfer resistance by adding liquid convection has a significant impact for hydrophobic but not for hydrophilic molecules.
+
+Perhaps the most interesting result of the study in \cref{sec:plasfree_model} is the sharp distinction between reactivity at the surface and in the liquid bulk. Though the limited penetration (tens of $\mu$m or less) of reactive neutral radicals is well publicized in prominent biochemistry texts like \cite{Halliwell}, this phenomena has yet to receive significant attention in the plasma-liquid literature with the exception of \cite{Chen2014a}. Concentrations of species of interest for plasma-medicine and other applications (e.g. OH, NO, ONOOH) fall by as many as 9 orders of magnitude within 50 $\mu$m of the interface. In a relatively pure aqueous solution as is modeled here, the process responsible for conveying plasma reactivity to a target may be transport of H$_2$O$_2$ and acidified nitrite followed by a close-proximity reaction to form ONOOH and then OH and NO$_2$. For targets in aqueous biological systems, the conveyors of reactivity may be proteins modified by primary plasma species. What can be stated from the results presented here and in \cite{Chen2014a} is that these conveyors of plasma reactivity are probably not neutral radicals generated directly by the plasma; rather they are likely species generated by secondary reactions in the aqueous medium or more stable compounds like H$_2$O$_2$ and nitrite. To address this problem with even greater precision and detail, future research will involve developing a configuration-specific plasma and electrodynamics model that can be self-consistently coupled to the momentum, heat, and neutral species mass transport presented in this study.
+
+The latter half of the chapter explores the fully self-consistent coupling of discharge physics with the liquid phase. The effects of varying unknown interfacial coefficients like $\gamma_{dens}$ and $\gamma_{en}$ are investigated. It is found that varying these parameters within reason can lead to interfacial gas-phase electron densities varying by orders of magnitude. The interfacial electron energy is also a very sensitive function of the interfacial parameters. This variation of electron density and energy could have significant impacts on both gas and liquid phase chemistry, thus our work motivates future studies to accurately determine the interfacial parameters. It is noteworthy that the overall potential drop and total current are relatively unaffected by changing gas-liquid interfacial parameters.
+
+Self-consistently coupling the liquid domain to the highly non-linear plasma discharge equations as is done for \cref{sec:plasliq} requires an efficient multi-physics code. Comsol, the package used for the simulations in the first half of \cref{chap:basic_science}, has typically struggled to efficiently solve plasma problems. Thus a new code, named Zapdos, was built on top of the MOOSE framework for the express purpose of plasma-liquid simulations (although the highly modular nature of the code makes it easily extensible to other low-temperature plasma problems). The structure of Zapdos is the subject of \cref{chap:zapdos}.
