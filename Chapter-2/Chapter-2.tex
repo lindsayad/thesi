@@ -63,14 +63,14 @@ with $\vec{u}$ representing the fluid velocity, $\rho$ the overall mass density,
 	\label{eq:viscosityTempDependence}
 \end{equation}
 
-where T$_b$ is the boiling point of the solvent (373 K in the case of water). Reaction rate coefficients and their temperature dependence are contained in table \ref{tab:rxns}. Because the fluid flow equations are solved prior to solution of the heat transport equation, the temperature dependence of transport parameters in equations \ref{eq:mass_cont} and \ref{eq:nav_stokes} is not included in this work. Model boundary conditions are as follows: for fluid flow, all solid walls are assumed to be no-slip, i.e. all velocity components at the walls are zero. For most results presented the gas-liquid interface is assumed to be flat and static. For the static interface, the z-velocity component at the interface is set to zero in both the gas and liquid phases. Both the normal and shear stresses are continous across the interface. One may question whether the assumption of a flat interface is valid when in reality the interface is deformed by the gas flow. In the results section it will be demonstrated that for the purpose of this work, an assumption of a flat interfaction is sufficient. For temperature calculations, all solid surfaces are assumed to be insulated; at the interface, the temperature is assumed continuous. Additionally, evaporation of water at the surface is coupled to the system's heat transport in the following way: \cite{bird2007transport}
+where T$_b$ is the boiling point of the solvent (373 K in the case of water). Reaction rate coefficients and their temperature dependence are contained in table \ref{tab:rxns}. Because the fluid flow equations are solved prior to solution of the heat transport equation, the temperature dependence of transport parameters in equations \ref{eq:mass_cont} and \ref{eq:nav_stokes} is not included in this work. Model boundary conditions are as follows: for fluid flow, all solid walls are assumed to be no-slip, i.e. all velocity components at the walls are zero. For most results presented the gas-liquid interface is assumed to be flat and static. For the static interface, the z-velocity component at the interface is set to zero in both the gas and liquid phases. Both the normal and shear stresses are continous across the interface. One may question whether the assumption of a flat interface is valid when in reality the interface is deformed by the gas flow. In the results section it will be demonstrated that for the purpose of this work, an assumption of a flat interface is sufficient. For temperature calculations, all solid surfaces are assumed to be insulated; at the interface, the temperature is assumed continuous. Additionally, evaporation of water at the surface is coupled to the system's heat transport in the following way: \cite{bird2007transport}
 
 \begin{equation}
     Q_b = J_{z,H_2O}\cdot H_{vap} = -D_{H_2O,g}\cdot \left.\frac{\partial C_{H_2O(g)}}{\partial z}\right|_{z=interface}\cdot H_{vap}
     \label{eq:vapheatsrc}
 \end{equation}
 
-where Q$_b$ is the heat flux, J$_{z,H_2O}$ is the molar flux of H$_2$O coming from evaporation, and H$_{vap}$ is the latent heat of vaporization for water. The concentration of water vapor at the interface is determined from Antoine's equation: \cite{antoine1888thermodynamic}
+where Q$_b$ is the heat flux, J$_{z,H_2O}$ is the molar flux of H$_2$O coming from evaporation, and H$_{vap}$ is the latent heat of vaporization for water. \Cref{eq:vapheatsrc} is not strictly true during transient dynamics; however, the approximation is good enough for our purposes. The concentration of water vapor at the interface is determined from Antoine's equation: \cite{antoine1888thermodynamic}
 
 \begin{equation}
     \log_{10}p = 8.07131 - \frac{1730.63}{233.426+T}
@@ -200,41 +200,63 @@ When the ``discharge region" is discussed, it is in reference to the gas region 
     \label{tab:inletconc}
 \end{table}
 
-\begin{table}[htpb]
-    \begin{center}
-        \begin{tabular}{l |p{6cm} |p{3cm}}\rmfamily
-            Reaction & Rate coefficient (Units of s$^{-1}$, m$^3$ mol$^{-1}$ s$^{-1}$, or m$^6$ mol$^{-2}$ s$^{-1}$. Temperature in K. Concentration of M in gas and H$_2$O in liquid are lumped into rate coefficient) & Reference \\ \hline \hline
-            Gas phase reactions \\
-            1. 2NO$_2 \rightarrow$ N$_2$O$_4$ & $6.02\cdot10^5\cdot(300/T)^{3.8}$ & \cite{Sakiyama2012b} \\
-            2. N$_2$O$_4 \rightarrow$ 2NO$_2$ & $4.4\cdot10^6\cdot\exp(-4952/T)$ & \cite{Sakiyama2012b} \\
-            3. NO + OH + M $\rightarrow$ HNO$_2$ + M & $1.1\cdot10^{7}\cdot(300/T)^{2.4}$ & \cite{Sakiyama2012b} \\
-            4. NO + NO$_2$ + H$_2$O $\rightarrow$ 2HNO$_2$ & 22 & \cite{wayne1951kinetics} \\
-            5. 2OH + M $\rightarrow$ H$_2$O$_2$ + M & $1.0\cdot10^7\cdot(T/300)^{-0.8}$ & \cite{Sakiyama2012b} \\
-            6. NO$_2$ + OH + M $\rightarrow$ HNO$_3$ + M & $3.2\cdot10^7\cdot(300/T)^{2.9}$ & \cite{Sakiyama2012b} \\
-            7. OH + HNO$_2$ $\rightarrow$ NO$_2$ + H$_2$O & $3.0\cdot10^6\cdot\exp(-390/T)$ & \cite{Sakiyama2012b} \\
-            8. 2HNO$_2$ $\rightarrow$ NO + NO$_2$ + H$_2$O & $6.0\cdot10^{-3}$ & \cite{Sakiyama2012b} \\
-            9. HNO$_2$ + HNO$_3$ $\rightarrow$ 2NO$_2$ + H$_2$O & 9.6 & \cite{Sakiyama2012b} \\
-            10. HNO$_3$ + NO $\rightarrow$ HNO$_2$ + NO$_2$ & $4.4\cdot10^{-3}$ & \cite{dorai2002modeling} \\
+\setcounter{magicrownumbers}{21}
+
+\begin{ThreePartTable}
+      \begin{TableNotes}
+      \end{TableNotes}
+      \begin{longtable}{>{\raggedright}m{3in} >{\raggedright}m{2in} >{\raggedright\arraybackslash}m{1.25in}}
+            \textbf{Reaction} & \textbf{Rate coefficient} (Units of s$^{-1}$, m$^3$ mol$^{-1}$ s$^{-1}$, or m$^6$ mol$^{-2}$ s$^{-1}$. Temperature in K. Concentration of M in gas and H$_2$O in liquid are lumped into rate coefficient) & \textbf{Reference} \\ \hline \hline
+            \endhead
+            \caption{Reactions considered in model}
+            \endfoot
+            \caption{Reactions considered in model}
+            \label{tab:rxns}
+            \endlastfoot
+
+            Gas phase reactions & & \\\hline
+            1. 2NO$_2 \rightarrow$ N$_2$O$_4$ & $6.02\cdot10^5\cdot(300/T)^{3.8}$ & \cite{Sakiyama2012b} \\\hline
+            2. N$_2$O$_4 \rightarrow$ 2NO$_2$ & $4.4\cdot10^6\cdot exp(-4952/T)$ & \cite{Sakiyama2012b} \\\hline
+            3. NO + OH + M $\rightarrow$ HNO$_2$ + M & $1.1\cdot10^{7}\cdot(300/T)^{2.4}$ & \cite{Sakiyama2012b} \\\hline
+            4. NO + NO$_2$ + H$_2$O $\rightarrow$ 2HNO$_2$ & 22 & \cite{wayne1951kinetics} \\\hline
+            5. 2OH + M $\rightarrow$ H$_2$O$_2$ + M & $1.0\cdot10^7\cdot(T/300)^{-0.8}$ & \cite{Sakiyama2012b} \\\hline
+            6. NO$_2$ + OH + M $\rightarrow$ HNO$_3$ + M & $3.2\cdot10^7\cdot(300/T)^{2.9}$ & \cite{Sakiyama2012b} \\\hline
+            7. OH + HNO$_2$ $\rightarrow$ NO$_2$ + H$_2$O & $3.0\cdot10^6\cdot exp(-390/T)$ & \cite{Sakiyama2012b} \\\hline
+            8. 2HNO$_2$ $\rightarrow$ NO + NO$_2$ + H$_2$O & $6.0\cdot10^{-3}$ & \cite{Sakiyama2012b} \\\hline
+            9. HNO$_2$ + HNO$_3$ $\rightarrow$ 2NO$_2$ + H$_2$O & 9.6 & \cite{Sakiyama2012b} \\\hline
+            10. HNO$_3$ + NO $\rightarrow$ HNO$_2$ + NO$_2$ & $4.4\cdot10^{-3}$ & \cite{dorai2002modeling} \\\hline
             \\
-            Liquid phase reactions \\
-            11. N$_2$O$_4$ + H$_2$O $\rightarrow$ NO$_2^-$ + NO$_3^-$ + 2H$^+$ & 1000 & \cite{coddington1999hydroxyl} \\
-            12. 2NO$_2$ + H$_2$O $\rightarrow$ NO$_2^-$ + NO$_3^-$ + 2H$^+$ & $8.4\cdot10^{4}\cdot\exp(-0.033\cdot(T-295))$ & \cite{park1988solubility} \\
-            13. NO + NO$_2$ + H$_2$O $\rightarrow$ 2NO$_2^-$ + 2H$^+$ & $1.6\cdot10^{5}$ & \cite{park1988solubility} \\
-            \ONOOHlong{}. NO$_2^-$ + H$_2$O$_2$ + H$^+$ $\rightarrow$ ONOOH + H$_2$O & $1.1\cdot10^{-3}$ & \cite{Lukes2014b}\\
-            \OHfromONOOH{}. ONOOH $\rightarrow$ .7(NO$_3^-$ + H$^+$) + .3(NO$_2$ + OH) & .8 & \cite{coddington1999hydroxyl}\\
-            \ONOOHshort{}. NO$_2$ + OH $\rightarrow$ ONOOH & $5.3\cdot10^{6}$ & \cite{Lukes2014b,goldstein2005chemistry}\\
-            17. 2OH + M $\rightarrow$ H$_2$O$_2$ + M & $1\cdot10^{7}\cdot\exp(-450\cdot(1/T-1/298))$ & \cite{johnaelliot1990estimation}\\
-            18. HNO$_2$ $\rightarrow$ H$^+$ + NO$_2^-$ & $3.51\cdot10^{6}$ & From reaction \NitrousAcidAssociation{} and equilibrium constant \\
-            \NitrousAcidAssociation{}. H$^+$ + NO$_2^-$ $\rightarrow$ HNO$_2$ & $7\cdot10^{6}$ & Assumes diffusion limited\\
-            \WaterAssociation{}. H$^+$ + OH$^-$ $\rightarrow$ H$_2$O & $7\cdot10^{6}$ & Assumes diffusion limited \\
-            21. H$_2$O $\rightarrow$ H$^+$ + OH$^-$ & $7\cdot10^{-2}$ & From reaction \WaterAssociation{} and equilibrium constant\\
-            22. NO + OH $\rightarrow$ HNO$_2$ & $2\cdot10^{7}$ & \cite{Tian2014}\\
-			23. 2HNO$_2$ $\rightarrow$ NO + NO$_2$ & $1.34\cdot10^{-2}\cdot\exp(.106\cdot(T-295))$ & \cite{park1988solubility}
-        \end{tabular}
-    \end{center}
-    \caption{Reactions considered in model}
-    \label{tab:rxns}
-\end{table}
+            Liquid phase reactions & & \\\hline
+            11. N$_2$O$_4$ + H$_2$O $\rightarrow$ NO$_2^-$ + NO$_3^-$ + 2H$^+$ & 1000 & \cite{coddington1999hydroxyl} \\\hline
+            12. 2NO$_2$ + H$_2$O $\rightarrow$ NO$_2^-$ + NO$_3^-$ + 2H$^+$ & $8.4\cdot10^{4}\cdot exp(-0.033\cdot(T-295))$ & \cite{park1988solubility} \\\hline
+            13. NO + NO$_2$ + H$_2$O $\rightarrow$ 2NO$_2^-$ + 2H$^+$ & $1.6\cdot10^{5}$ & \cite{park1988solubility} \\\hline
+            \ONOOHlong{}. NO$_2^-$ + H$_2$O$_2$ + H$^+$ $\rightarrow$ ONOOH + H$_2$O & $1.1\cdot10^{-3}$ & \cite{Lukes2014b}\\\hline
+            \OHfromONOOH{}. ONOOH $\rightarrow$ .7(NO$_3^-$ + H$^+$) + .3(NO$_2$ + OH) & .8 & \cite{coddington1999hydroxyl}\\\hline
+            \ONOOHshort{}. NO$_2$ + OH $\rightarrow$ ONOOH & $5.3\cdot10^{6}$ & \cite{Lukes2014b,goldstein2005chemistry}\\\hline
+            17. 2OH + M $\rightarrow$ H$_2$O$_2$ + M & $1\cdot10^{7}\cdot exp(-450\cdot(1/T-1/298))$ & \cite{johnaelliot1990estimation}\\\hline
+            18. HNO$_2$ $\rightarrow$ H$^+$ + NO$_2^-$ & $3.51\cdot10^{6}$ & From reaction \NitrousAcidAssociation{} and equilibrium constant \\\hline
+            \NitrousAcidAssociation{}. H$^+$ + NO$_2^-$ $\rightarrow$ HNO$_2$ & $7\cdot10^{6}$ & Assumes diffusion limited\\\hline
+            \WaterAssociation{}. H$^+$ + OH$^-$ $\rightarrow$ H$_2$O & $7\cdot10^{6}$ & Assumes diffusion limited \\\hline
+            21. H$_2$O $\rightarrow$ H$^+$ + OH$^-$ & $7\cdot10^{-2}$ & From reaction \WaterAssociation{} and equilibrium constant\\\hline
+            22. NO + OH $\rightarrow$ HNO$_2$ & $2\cdot10^{7}$ & \cite{Tian2014}\\\hline
+	    23. 2HNO$_2$ $\rightarrow$ NO + NO$_2$ & $1.34\cdot10^{-2}\cdot exp(.106\cdot(T-295))$ & \cite{park1988solubility}\\\hline
+            \\
+            Tyrosine reactions & & \\\hline
+            \rownumber. NO$_2$ + Tyr $\rightarrow$ NO$_2^-$ + Tyr(radical) & $2.90\cdot10^4$ & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. Tyr(radical) + NO $\rightarrow$ Tyr-NO & $1.00\cdot10^6$ & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. Tyr-NO $\rightarrow$ Products & 2 & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. Tyr-NO $\rightarrow$ Tyr(radical) + NO & $1\cdot10^3$ & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. Tyr(radical) + Tyr(radical) $\rightarrow$ diTyr & $2.25\cdot10^5$ & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. NO$_2$ + Tyr(radical) $\rightarrow$ Tyr-NO$_2$ & $1.30\cdot10^6$ & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. NO$_2$ + Tyr(radical) $\rightarrow$ Other products & $1.70\cdot10^6$ & \cite{goldstein2000tyrosine}\\\hline
+            \rownumber. Tyr + OH $\rightarrow$ TyrOHo & $7\cdot10^6$ & \cite{solar1984reactivity}\\\hline
+            \rownumber. Tyr + OH $\rightarrow$ TyrOHm & $5\cdot10^6$ & \cite{solar1984reactivity}\\\hline
+            \rownumber. Tyr + OH $\rightarrow$ Tyr(radical) & $6\cdot10^5$ & \cite{solar1984reactivity}\\\hline
+            \rownumber. TyrOHm + TyrOHm $\rightarrow$ products & $1\cdot10^6$ & \cite{solar1984reactivity}\\\hline
+            \rownumber. TyrOHo + TyrOHo $\rightarrow$ products & $1.5\cdot10^5$ & \cite{solar1984reactivity}\\\hline
+            \rownumber. TyrOHo $\rightarrow$ Tyr(radical) + H$_2$O & $1.8\cdot10^4$ & \cite{solar1984reactivity}\\\hline
+        \end{longtable}
+\end{ThreePartTable}
 
 \subsection{Results and Discussion}
 
@@ -352,7 +374,7 @@ To study this, we constructed a 1D model of just the liquid phase, neglecting li
 
 On a related note, the 1D model can be used to analyze the effect of the uniform dilution factor used in the 2D-axisymmetric model on the penetration distance of radicals. From the species mass conservation equations we expect penetration distances to decrease as input concentrations are scaled up since the only non-linear terms are reaction sinks. More precisely, the dimensionless Damkohler number, $Da=\frac{kCL^2}{D}$, for a second-order reaction-diffusion problem shows that the penetration distance will scale like $\frac{1}{\sqrt{C}}$. \cite[p. 55]{deen1998analysis} This hypothesis is confirmed by the 1D model. When the interfacial concentrations from the 2D-axisymmetric model are input directly into the 1D model, OH and NO penetration distances are 18 and 15 microns respectively. These are almost exactly a factor of $\sqrt{10}$ greater than the 5.8 and 4.7 $\mu$m penetration distances seen when the concentration inputs are scaled up by 10. If the concentrations are increased more, the penetration distances are even further reduced, following the scaling of $\frac{1}{\sqrt{C}}$. These analyses of the radical concentration profiles support one of our main arguments: though the amount and type of species present at the plasma-liquid interface may vary between discharge types, most of the plasma generated reactivity will likely lie within a small interfacial region, microns to a couple hundred microns, regardless of the experimental configuration.
 
-Returning to the 2D model, we can introduce a dissolved marker like Tyrosine into solution and observe its degradation via reactive plasma species and predict product formation for potential future validation with experiments. \Cref{fig:tyr_conc} shows the concentration profile of tyrosine after fifteen minutes of exposure to reactive plasma species. The origin represents the stagnation point or the point at which the center of the plasma column impinges on the liquid surface. Z = 0 represents the water surface. After treatment, the concentration of tyrosine at the surface has been roughly cut in half. The presence of bulk liquid advection is evident in the decreased tyrosine concentration surrounding a local maximum at roughly (.01, -.0015). We can also look at the volume-averaged concentrations of tyrosine products in \cref{fig:tyr_products}. TyrDot is tyrosine radical, diTyr is dityrosine, TyrNO is tyrosine with an added NO functional group, TyrNO2 has an added NO$_2$ functional group, and TyrOHo and TurOHm are tyrosine with an additional OH functional group at the ortho- and meta- positions respectively. Our model predicts that dityrosine will be the dominant terminal specie with TyrOHm and TyrDot representing important reactive intermediates.
+Returning to the 2D model, we can introduce a dissolved marker like Tyrosine into solution and observe its degradation via reactive plasma species and predict product formation for potential future validation with experiments. Tyrosine reactions are detailed at the end of \cref{tab:rxns}. \Cref{fig:tyr_conc} shows the concentration profile of tyrosine after fifteen minutes of exposure to reactive plasma species. The origin represents the stagnation point or the point at which the center of the plasma column impinges on the liquid surface. Z = 0 represents the water surface. After treatment, the concentration of tyrosine at the surface has been roughly cut in half. The presence of bulk liquid advection is evident in the decreased tyrosine concentration surrounding a local maximum at roughly (.01, -.0015). We can also look at the volume-averaged concentrations of tyrosine products in \cref{fig:tyr_products}. TyrDot is tyrosine radical, diTyr is dityrosine, TyrNO is tyrosine with an added NO functional group, TyrNO2 has an added NO$_2$ functional group, and TyrOHo and TurOHm are tyrosine with an additional OH functional group at the ortho- and meta- positions respectively. Our model predicts that dityrosine will be the dominant terminal specie with TyrOHm and TyrDot representing important reactive intermediates.
 
 \begin{figure}[htb]
     \centering
@@ -409,7 +431,7 @@ Though comprehensive in many respects, the model in this section is not near com
   \label{fig:powerDep_em_int}
 \end{figure}
 
-\Cref{fig:powerDep_em_int} shows the power deposited into electrons from Joule Heating over the last 100 $\mu$m of the gas domain. It is evident that there is significantly more heating of the electrons for the higher reflection cases. This is almost entirely attributable to the enhanced electric field in the region (\cref{fig:efield_int}) that develops because of the build-up in negative charge density (\cref{fig:charge_dens_int}) from electron reflection. The electron current itself does not change with reflection as evidenced in \cref{fig:currents}.
+\Cref{fig:powerDep_em_int} shows the power deposited into electrons from joule heating over the last 100 $\mu$m of the gas domain. It is evident that there is significantly more heating of the electrons for the higher reflection cases. This is almost entirely attributable to the enhanced electric field in the region (\cref{fig:efield_int}) that develops because of the build-up in negative charge density (\cref{fig:charge_dens_int}) from electron reflection. The electron current itself does not change with reflection as evidenced in \cref{fig:currents}.
 
 \begin{figure}[htpb]
   \centering

@@ -172,6 +172,8 @@
 \usepackage[format=plain,justification=RaggedRight,singlelinecheck=false,font=small,labelfont=bf,labelsep=space]{caption}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
+\newcounter{magicrownumbers}
+\newcommand\rownumber{\stepcounter{magicrownumbers}\arabic{magicrownumbers}}
 
 %http://tex.stackexchange.com/questions/100817/error-when-using-bc-from-abbrevs-in-caption
 %Getting BC
