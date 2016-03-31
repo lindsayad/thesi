@@ -4,12 +4,12 @@
 \Cref{chap:intro} outlined a few fundamental questions in plasma-liquids that had yet to be explored. These included:
 
 \begin{itemize}
-\item What's the role of convection in transport processes between plasma and liquid phases for discharges like coronas and jets?
+\item What is the role of convection in transport processes between plasma and liquid phases for discharges like coronas and jets?
 \item How does varying interfacial parameters like the electron surface loss coefficient affect important plasma-liquid variables?
 \item Why does decreasing solution conductivity increase the spreading of discharges over the liquid surface?
 \end{itemize}
 
-The role of convection is investigated in \cref{sec:plasfree_model}. Influence of interfacial parameters is considered in \cref{sec:plasliq}. While not explored in this dissertation, \cref{sec:plasliq} lays much needed groundwork for answering the third fundamental question of solution conductivity and discharge spreading.
+The role of convection is investigated in \cref{sec:plasfree_model}. Influence of interfacial parameters is considered in \cref{sec:plasliq}. While not explored in this dissertation, \cref{sec:plasliq} lays much needed groundwork for exploring the relationship between solution conductivity and discharge spreading.
 
 \section{Momentum, Heat, and Neutral Mass Transport}
 \label{sec:plasfree_model}
@@ -28,7 +28,7 @@ The convective system chosen for modelling is shown in \cref{fig:streamer_pictur
     \label{fig:streamer_picture}
 \end{figure}
 
-For the work in \cref{sec:plasfree_model}, we have chosen not to explicitly model the atmospheric discharge due to the computational cost of modeling of gas-liquid interfacial transport over time-scales of minutes (the equivalent of millions of individual pulses) using Comsol's seemingly inefficient plasma module. Instead, gas phase concentrations of the species modeled are taken from the DBD-water calculations in \cite{Tian2014} and diluted by a factor of 10; the gas phase species included and their respective inlet concentrations are shown in table \ref{tab:inletconc}. The factor 10 dilution is done for numerical stability.  High concentrations of reactive oxygen and nitrogen species (RONS) at the interface combined with very fast rate coefficients, particularly for reactions involving OH, can lead to singularities over our time scales of interest unless the computational mesh is sufficiently refined, requiring significant computational power. All concentration results and discussion will be focused on relative magnitudes and variation with space and time. The results in \cite{Tian2014} are chosen as an input basis because of the absence of experimental work for atmospheric plasmas in which a suite of gas-phase plasma species concentrations are reported. Most of the measurements in the literature focus on single species like OH \cite{ono1998measurement,ono2001oh,nakagawa2011density,verreycken2012time}, atomic oxygen \cite{niemi2005absolute}, or NO \cite{kanazawa2003two} that are accessible through Laser Induced Fluorescence (LIF).
+For the work in \cref{sec:plasfree_model}, we have chosen not to explicitly model the atmospheric discharge due to the computational cost of modeling of gas-liquid interfacial transport over time-scales of minutes (the equivalent of millions of individual pulses) using Comsol's seemingly inefficient plasma module. Instead, gas phase concentrations of the species modeled are taken from the DBD-water calculations in \cite{Tian2014} and diluted by a factor of 10; the gas phase species included and their respective inlet concentrations are shown in table \ref{tab:inletconc}. The factor 10 dilution is done for numerical stability. The potential effects of the dilution are discussed in \cref{sec:neutral_results}. High concentrations of reactive oxygen and nitrogen species (RONS) at the interface combined with very fast rate coefficients, particularly for reactions involving OH, can lead to singularities over our time scales of interest unless the computational mesh is sufficiently refined, requiring significant computational power. All concentration results and discussion will be focused on relative magnitudes and variation with space and time. The results in \cite{Tian2014} are chosen as an input basis because of the absence of experimental work for atmospheric plasmas in which a suite of gas-phase plasma species concentrations are reported. Most of the measurements in the literature focus on single species like OH \cite{ono1998measurement,ono2001oh,nakagawa2011density,verreycken2012time}, atomic oxygen \cite{niemi2005absolute}, or NO \cite{kanazawa2003two} that are accessible through Laser Induced Fluorescence (LIF) or resonant absorption spectroscopy. \cite{hibert1999oh} Some of our own absorption measurements of hydroxyl are discussed in \cref{sec:absorption}.
 
 A key feature of streamer discharges is the ionic wind. The ionic wind is a net flow of gas towards the cathode that results from the effective drag of cations on neutral gas molecules. In the streamer-liquid system studied, the ionic wind creates convective forces that affect species transport at the gas-liquid interface. Since the discharge is not modelled, another mechanism must be used to produce the ionic wind present in a streamer discharge. The mechanism chosen is a jet-like inlet with diameter equal to the diameter of the needle used in the experimental streamer set-up. The velocity profile at the inlet of the jet flow development channel is chosen such that the channel exit profile closely mimics that expected from streamer experiments and modeling. \cite{Zhao2005a} The profile is built from the expected streamer maximum axial velocity which is in turn determined from the work of Zhao et. al. Using values of 6 kV for the discharge voltage and 6.5 mm for the gap distance, the maximum axial velocity is interpolated to be 7.75 m/s near the needle tip. The spatial inlet profile is then computed from \cref{eq:v_in} assuming laminar no-slip conditions in the inlet channel: \cite{bird2007transport}
 
@@ -77,7 +77,7 @@ where Q$_b$ is the heat flux, J$_{z,H_2O}$ is the molar flux of H$_2$O coming fr
     \label{eq:Antoine}
 \end{equation}
 
-with p in units of mmHg, T in units of degrees Celsius, and the constant values taken from \cite{dimian2014integrated}.  The temperature at the gas inlet is set to 300 K for all times. Initially the temperature in both gas and liquid domains is 300 K. Inlet concentrations for species other than water vapor are specified at the beginnning of the jet flow development channel and are given in \cref{tab:inletconc}. Dilute species that are present in both gas and aqueous phases (OH, H$_2$O$_2$, NO, NO$_2$, N$_2$O$_4$, HNO$_2$, and HNO$_3$) have continuous fluxes across the gas-liquid interface. Concentrations immediately above and below the interface are assumed to be in equilibrium as described by their Henry's law coefficients, listed in \cref{tab:henryconstants}. A limited set of gas and liquid phase reactions encompassing the most important NO$_x$ chemistry is used to reduce computational expense. Even with this simplified reaction set and diluted concentration inputs, the simulation takes multiple days on a quad-core desktop and approaches 16 GB in required memory. As we move towards a more parallelizable software framework (see \cref{sec:plasliq} and \cref{chap:zapdos}), we plan to incorporate a more complete set of reacting species and reactions.  Some important species that were not included in this simplified set include oxygen and hydrogen radicals as well as water cluster ions to name a few. The reactions used in this study and their corresponding rate coefficients are listed in \cref{tab:rxns}. It should be noted that because of its highly acidic nature (pKa ~ -1.3), HNO$_3$ is assumed to dissociate into H$^+$ and NO$_3^-$ immediately after entering the aqueous phase. The model equations are solved using the finite element method implemented in Comsol Multiphysics version 4.4. A copy of the model is freely available upon request.
+with p in units of mmHg, T in units of degrees Celsius, and the constant values taken from \cite{dimian2014integrated}.  The temperature at the gas inlet is set to 300 K for all times. Initially the temperature in both gas and liquid domains is 300 K. Inlet concentrations for species other than water vapor are specified at the beginnning of the jet flow development channel and are given in \cref{tab:inletconc}. Dilute species that are present in both gas and aqueous phases (OH, H$_2$O$_2$, NO, NO$_2$, N$_2$O$_4$, HNO$_2$, and HNO$_3$) have continuous fluxes across the gas-liquid interface. Concentrations immediately above and below the interface are assumed to be in equilibrium as described by their Henry's law coefficients, listed in \cref{tab:henryconstants}. A limited set of gas and liquid phase reactions encompassing the most important NO$_x$ chemistry is used to reduce computational expense. Even with this simplified reaction set and diluted concentration inputs, the simulation takes multiple days on a quad-core desktop and approaches 16 GB in required memory. A move towards a more parallelizable software framework (see \cref{sec:plasliq} and \cref{chap:zapdos}) will enable incorporation of a more complete set of reacting species and reactions.  Some important species that were not included in this simplified set include oxygen and hydrogen radicals as well as water cluster ions to name a few. \cite{liu2010global} The reactions used in this study and their corresponding rate coefficients are listed in \cref{tab:rxns}. It should be noted that because of its highly acidic nature (pKa ~ -1.3), HNO$_3$ is assumed to dissociate into H$^+$ and NO$_3^-$ immediately after entering the aqueous phase. The model equations are solved using the finite element method implemented in Comsol Multiphysics version 4.4.\footnote{A copy of the model is freely available upon request.}
 
 When the ``discharge region" is discussed, it is in reference to the gas region roughly demarcated in the z direction by the jet outlet/needle anode and the water surface, and in the radial direction by the radius of the jet channel/needle, where the plasma is visible during experiments. The reader is reminded that the plasma and its electrodynamics are not explicitly modeled in \cref{sec:plasfree_model}; the focus of this investigation is the qualitative behavior of momentum, heat, and neutral species mass transport in convective systems. The qualitative conclusions drawn here are equally applicable to atmospheric jets or streamer systems in which the ionic wind plays a key role in momentum transport. Moreover, we postulate that the steep gradients in highly reactive neutral species concentrations at the gas-liquid interface shown in the proceeding section are a universal phenomena of atmospheric plasma-liquid systems, regardless of whether they are convective or diffusive; this is consistent with the recent research by \cite{Chen2014a} as well as the greater reservoir of biochemistry literature \cite{Halliwell}. Morever, these gradients have important implications for plasma medicine, mainly that cellular responses must be induced through secondary as opposed to directly generated plasma reactivity.
 
@@ -259,6 +259,7 @@ When the ``discharge region" is discussed, it is in reference to the gas region 
 \end{ThreePartTable}
 
 \subsection{Results and Discussion}
+\label{sec:neutral_results}
 
 The steady state velocity field is shown in figure \ref{fig:v_field}. The recirculating pattern observed in the gas phase is consistent with the corona discharge modelling results reported in \cite{Zhao2005a}. A similar recirculation pattern is observed in the liquid phase, induced by shear stresses between the phases at the gas-liquid interface. The maximum liquid phase velocity, .1 m/s, occurs along the interface approximately .8 mm away from the stagnation point (r = 0).
 
@@ -284,19 +285,18 @@ Another instance of transport coupling that may impact plasma-liquid chemistry i
 
 \begin{figure}[htb]
     \centering
-        \includegraphics[width=\textwidth]{1D_temperature_plot.eps}
-        \caption{Temperature along z-axis. Illustrates the large temperature gradient that exists at the gas-liquid interface and the resulting difference in bulk gas and liquid temperatures.}
-        \label{fig:temp_1D_profile}
-\end{figure}
-
-\begin{figure}[htb]
-    \centering
         \includegraphics[width=\textwidth]{WaterVapor2D.eps}
         %\includegraphics[width=\textwidth]{Water_vapor.jpg}
         \caption{2-D water vapor profile at t = 1000 seconds. Red color represents higher values of water vapor concentration; blue color lower values. As implemented through Antoine's equation, water vapor concentration at the interface is highest where the temperature is highest. Role of convection in water vapor profile is evident in decreased concentration near the streamer/jet.}
         \label{fig:water_2D_profile}
 \end{figure}
 
+\begin{figure}[htb]
+    \centering
+        \includegraphics[width=\textwidth]{1D_temperature_plot.eps}
+        \caption{Temperature along z-axis. Illustrates the large temperature gradient that exists at the gas-liquid interface and the resulting difference in bulk gas and liquid temperatures.}
+        \label{fig:temp_1D_profile}
+\end{figure}
 
 \begin{figure}[htb]
     \centering
@@ -350,7 +350,7 @@ When the full reaction set is considered, large gradients in reactive species co
     \label{fig:log_OH_conc}
 \end{figure}
 
-Another plasma-generated specie which has received much attention in the literature is peroxynitrous acid and its conjugate base peroxynitrite. In the current model, ONOOH exists only in the liquid phase and can be created through two mechanisms: reactions \ONOOHlong{} and \ONOOHshort{} in table \ref{tab:rxns}. Reaction \ONOOHlong{} was the topic of an excellent study in \cite{Lukes2014b} and is hypothesized to be a key player in the long-term anti-bacterial efficacy of plasma activated water. Figure \ref{fig:log_ONOOH_conc} shows the base 10 log of ONOOH concentration as a function of r and z in the aqueous phase. As with OH, there are large interfacial concentration gradients. At r=0, the ONOOH concentration drops by 5 orders of magnitude over 30 $\mu$m in the axial direction. Away from the stagnation point, especially where the convective current flows away from the interface, the interfacial gradient is much smaller but again as with OH, the highest bulk concentration is orders of magnitude lower than the peak surface concentration. The reason for these large ONOOH gradients is the relative dominance of reaction \ONOOHshort{} over reaction \ONOOHlong{} for the given model inputs. Over the course of the simulation, almost 7000 times more ONOOH is produced through the reaction of OH and NO$_2$ than through the reaction of H$^+$, H$_2$O$_2$, and NO$_2^-$. As shown in figure \ref{fig:log_OH_conc}, hydroxyl does not penetrate any more than a few tens of microns into the liquid phase, so consequently all ONOOH produced through OH is produced within a few tens of microns of the liquid surface. If we examine the production of ONOOH through reaction \ONOOHlong{}, it is observed to be much more uniform as illustrated in figure \ref{fig:log_ONOOH_prod_rate}. This is because of the relative uniformity in concentration of H$^+$, NO$_2^-$, and H$_2$O$_2$, although there is a peak in their concentrations and consequently in their production of ONOOH in the vicinity of the impinging streamer/jet. Once the streamer is turned off and surface fluxes of ON and NO$_2$ are removed, production of ONOOH(aq) will proceed almost exclusively through reaction \ONOOHlong{}, resulting in a mostly homogeneous distribution. This is relevent for applications of PAW since ONOOH is the long-term intermediary for production of OH through reaction \OHfromONOOH{}.
+Another plasma-generated specie which has received much attention in the literature is peroxynitrous acid (ONOOH) and its conjugate base peroxynitrite (ONOO$^-$). In the current model, ONOOH exists only in the liquid phase and can be created through two mechanisms: reactions \ONOOHlong{} and \ONOOHshort{} in table \ref{tab:rxns}. Reaction \ONOOHlong{} was the topic of an excellent study in \cite{Lukes2014b} and is hypothesized to be a key player in the long-term anti-bacterial efficacy of plasma activated water. Figure \ref{fig:log_ONOOH_conc} shows the base 10 log of ONOOH concentration as a function of r and z in the aqueous phase. As with OH, there are large interfacial concentration gradients. At r=0, the ONOOH concentration drops by 5 orders of magnitude over 30 $\mu$m in the axial direction. Away from the stagnation point, especially where the convective current flows away from the interface, the interfacial gradient is much smaller but again as with OH, the highest bulk concentration is orders of magnitude lower than the peak surface concentration. The reason for these large ONOOH gradients is the relative dominance of reaction \ONOOHshort{} over reaction \ONOOHlong{} for the given model inputs. Over the course of the simulation, almost 7000 times more ONOOH is produced through the reaction of OH and NO$_2$ than through the reaction of H$^+$, H$_2$O$_2$, and NO$_2^-$. As shown in figure \ref{fig:log_OH_conc}, hydroxyl does not penetrate any more than a few tens of microns into the liquid phase, so consequently all ONOOH produced through OH is produced within a few tens of microns of the liquid surface. If we examine the production of ONOOH through reaction \ONOOHlong{}, it is observed to be much more uniform as illustrated in figure \ref{fig:log_ONOOH_prod_rate}. This is because of the relative uniformity in concentration of H$^+$, NO$_2^-$, and H$_2$O$_2$, although there is a peak in their concentrations and consequently in their production of ONOOH in the vicinity of the impinging streamer/jet. Once the streamer is turned off and surface fluxes of ON and NO$_2$ are removed, production of ONOOH(aq) will proceed almost exclusively through reaction \ONOOHlong{}, resulting in a mostly homogeneous distribution. This is relevent for applications of PAW since ONOOH is the long-term intermediary for production of OH through reaction \OHfromONOOH{}.
 
 \begin{figure}[htb]
     \centering
@@ -424,6 +424,8 @@ Though comprehensive in many respects, the model in this section is not near com
 
 % Figures to add text for:
 
+\Cref{fig:powerDep_em_int} shows the power deposited into electrons from joule heating over the last 100 $\mu$m of the gas domain. It is evident that there is significantly more heating of the electrons for the higher reflection cases. This is almost entirely attributable to the enhanced electric field in the region (\cref{fig:efield_int}) that develops because of the build-up in negative charge density (\cref{fig:charge_dens_int}) from electron reflection. The electron current itself does not change with reflection as evidenced in \cref{fig:currents}.
+
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=.75\textwidth]{dummy_PowerDep_em.eps}
@@ -431,7 +433,7 @@ Though comprehensive in many respects, the model in this section is not near com
   \label{fig:powerDep_em_int}
 \end{figure}
 
-\Cref{fig:powerDep_em_int} shows the power deposited into electrons from joule heating over the last 100 $\mu$m of the gas domain. It is evident that there is significantly more heating of the electrons for the higher reflection cases. This is almost entirely attributable to the enhanced electric field in the region (\cref{fig:efield_int}) that develops because of the build-up in negative charge density (\cref{fig:charge_dens_int}) from electron reflection. The electron current itself does not change with reflection as evidenced in \cref{fig:currents}.
+Power deposition into both electrons and ions for the cases of $\gamma_{dens}=1$ and $\gamma_{dens}=10^{-4}$ are shown in \cref{fig:powerDep_em_Arp_full}. Ion power deposition profiles are identical between the different reflection cases. As expected for a DC discharge, all of the ion power deposition occurs in the cathode fall where both the electric field and ion current are significantly higher than in the bulk. Electron heating occurs throughout the discharge with local maxima in both the cathode and anode regions.
 
 \begin{figure}[htpb]
   \centering
@@ -447,7 +449,7 @@ Though comprehensive in many respects, the model in this section is not near com
   \label{fig:powerDep_em_Arp_full}
 \end{figure}
 
-Power deposition into both electrons and ions for the cases of $\gamma_{dens}=1$ and $\gamma_{dens}=10^{-4}$ are shown in \cref{fig:powerDep_em_Arp_full}. Ion power deposition profiles are identical between the different reflection cases. As expected for a DC discharge, all of the ion power deposition occurs in the cathode fall where both the electric field and ion current are significantly higher than in the bulk. Electron heating occurs throughout the discharge with local maxima in both the cathode and anode regions.
+\Cref{fig:rateProc} shows the rate of elastic, excitation, and ionization collisions in the discharge. Elastic collision rates show an inverse relationship to the electron temperature: in the cathode where the electron temperature peaks, the elastic collision rate crashes; in the anode for the high reflection case ($\gamma_{dens}=10^{-4}$) the elastic collision rate peaks sharply because of the sharp fall in the electron temperature. Excitation collision rates are uniform through the bulk of the discharge for both high and low reflecion cases. Ionization rates peak in the bulk-sheath interface regions where the electron temperature is highest. Both excitation and ionization rates collapse in the cathode where electrons have not had sufficient time to gain energy; for high electron reflection the excitation and ionization rates also collapse in the anode.
 
 \begin{figure}[htpb]
   \centering
@@ -456,7 +458,7 @@ Power deposition into both electrons and ions for the cases of $\gamma_{dens}=1$
   \label{fig:rateProc}
 \end{figure}
 
-\Cref{fig:rateProc} shows the rate of elastic, excitation, and ionization collisions in the discharge. Elastic collision rates show an inverse relationship to the electron temperature: in the cathode where the electron temperature peaks, the elastic collision rate crashes; in the anode for the high reflection case ($\gamma_{dens}=10^{-4}$) the elastic collision rate peaks sharply because of the sharp fall in the electron temperature. Excitation collision rates are uniform through the bulk of the discharge for both high and low reflecion cases. Ionization rates peak in the bulk-sheath interface regions where the electron temperature is highest. Both excitation and ionization rates collapse in the cathode where electrons have not had sufficient time to gain energy; for high electron reflection the excitation and ionization rates also collapse in the anode.
+\Cref{fig:currents} is a somewhat busy figure. It illustrates the currents carried by different species in gas and liquid phases as well as the total current. Dotted lines indicate the total current, solid lines the electron current, and dashed lines the argon and hydroxyl currents in the gas and liquid phases respectively. The curves do not show a strong functional dependence on the surface loss coefficient $\gamma_{dens}$. Current is carried by argon ions in the cathode, transitioning to electrons in the gas bulk and through the gas-liquid interface. As electrons react with water molecules, OH$^-$ becomes the dominant liquid current carrier away from the interface.
 
 \begin{figure}[htpb]
   \centering
@@ -465,7 +467,7 @@ Power deposition into both electrons and ions for the cases of $\gamma_{dens}=1$
   \label{fig:currents}
 \end{figure}
 
-\Cref{fig:currents} is a somewhat busy figure. It illustrates the currents carried by different species in gas and liquid phases as well as the total current. Dotted lines indicate the total current, solid lines the electron current, and dashed lines the argon and hydroxyl currents in the gas and liquid phases respectively. The curves do not show a strong functional dependence on the surface loss coefficient $\gamma_{dens}$. Current is carried by argon ions in the cathode, transitioning to electrons in the gas bulk and through the gas-liquid interface. As electrons react with water molecules, OH$^-$ becomes the dominant liquid current carrier away from the interface.
+Electron total, advective, and diffusive fluxes are illustrated in \cref{fig:electron_fluxes}. Consistent with \cref{fig:currents}, the total electron current rises from zero at the cathode to a constant value that it maintains through the gas bulk to the interface. The total current declines in the liquid phase because of electron reactions with H$_2$O. Advection and diffusion flux profiles are very similar between high and low reflection cases with the exception of the behavior very near the gas-liquid interface. Advective flux builds in the cathode until reaching a peak at the sheath-bulk interface. The advective flux then gradually declines in the bulk because of a gradual decrease in the bulk electric field until plummeting sharply in the anode as the electron density plummets; however, for the high reflection case very near the gas-liquid interface the advective flux rebounds sharply. This counter-acts the very strong leftward diffusive flux that arises from the large build-up in electron concentration. The net effect is that the total electron flux remains constant.
 
 \begin{figure}[htpb]
   \centering
@@ -474,7 +476,39 @@ Power deposition into both electrons and ions for the cases of $\gamma_{dens}=1$
   \label{fig:electron_fluxes}
 \end{figure}
 
-Electron total, advective, and diffusive fluxes are illustrated in \cref{fig:electron_fluxes}. Consistent with \cref{fig:currents}, the total electron current rises from zero at the cathode to a constant value that it maintains through the gas bulk to the interface. The total current declines in the liquid phase because of electron reactions with H$_2$O. Advection and diffusion flux profiles are very similar between high and low reflection cases with the exception of the behavior very near the gas-liquid interface. Advective flux builds in the cathode until reaching a peak at the sheath-bulk interface. The advective flux then gradually declines in the bulk because of a gradual decrease in the bulk electric field until plummeting sharply in the anode as the electron density plummets; however, for the high reflection case very near the gas-liquid interface the advective flux rebounds sharply. This counter-acts the very strong leftward diffusive flux that arises from the large build-up in electron concentration. The net effect is that the total electron flux remains constant.
+The Zapdos plasma fluid model can be compared and tested against PIC calculations conducted by Emi Kawamura. \cite{emiComm} A comparison of ion densities and electron densities for the Zapdos electron energy equation (EEE) model (\cref{eq:ions,eq:electrons,eq:gamma_i,eq:gamma_e,eq:source_term,eq:poisson,eq:electron_energy,eq:gamma_eps}), a Zapdos local field approximation (LFA) model, and Emi's PIC calculations is shown in figures \ref{fig:ion_density_math} and \ref{fig:electron_density_math}. Agreement between the LFA and EEE fluid models is very good. However, the fluid models fail to capture the magnitude or shape of the density profiles in the cathode region predicted by PIC. Disparities in PIC and fluid calculations in the cathode region of atmospheric DC discharges have been observed in previous simulation work.\cite{hong2008modeling,choi2007electron,hagelaar2000monte} Additionally, the results here are consistent with the knowledge that in the cathode region the drift-diffusion approximation can lead to large errors in density without too seriously affecting the rest of the discharge.\cite{hagelaar2005solving,hagelaar2000monte} Consequently, the difference in PIC and fluid model predictions for the densities in the cathode is not surprising. A difference of a factor of two or less in the bulk densities is not too great and the differences decrease moving away from the cathode.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.6\textwidth]{LFA_mean_en_ion_density_compare.eps}
+  \caption{Comparison of ion densites computed by Zapdos local field approximation (LFA), Zapdos electron energy equation (EEE), and PIC models}
+  \label{fig:ion_density_math}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.6\textwidth]{LFA_mean_en_electron_density_compare.eps}
+  \caption{Comparison of electron densites computed by Zapdos local field approximation (LFA), Zapdos electron energy equation (EEE), and PIC models}
+  \label{fig:electron_density_math}
+\end{figure}
+
+Comparison electric field profiles computed by EEE, LFA, and PIC models is shown in \cref{fig:efield_math}. The electric field at the cathode boundary shows excellent agreement among the three models. However, the larger ion density seen in the PIC model in \cref{fig:ion_density_math} leads to a greater decrease in the electric field magnitude as we move through the cathode sheath. Consequently, the bulk electric field magnitude is roughly a factor of two less in the PIC model than in the EEE and LFA fluid models.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.6\textwidth]{LFA_mean_en_efield_compare.eps}
+  \caption{Comparison of electric field profiles computed by Zapdos local field approximation (LFA), Zapdos electron energy equation (EEE), and PIC models}
+  \label{fig:efield_math}
+\end{figure}
+
+\Cref{fig:etemp_math} shows the electron temperature profiles computed by EEE and PIC models. Bulk and anode temperature profiles are in excellent agreement. Cathode profiles differ but this can again be attributed to the inability of the fluid model to accurately capture electron kinetics near the boundary. In summary, as shown by \cref{fig:ion_density_math,fig:electron_density_math,fig:efield_math,fig:etemp_math} the Zapdos fluid models qualitatively reproduce the plasma dynamics predicted by PIC. There are some discrepancies between the models in the cathode region because of the more accurate kinetic treatment provided by PIC. Future work described in more detail in \cref{chap:conclusion} could lead to a hybrid model implemented in Zapdos in which electron behavior in the cathode and perhaps near the water interface is described kinetically while bulk behavior is described with the current EEE fluid model.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.6\textwidth]{LFA_mean_en_etemp_compare.eps}
+  \caption{Comparison of electron temperature profiles computed by Zapdos electron energy equation (EEE) and PIC models}
+  \label{fig:etemp_math}
+\end{figure}
 
 \section{Summary}
 
