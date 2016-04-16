@@ -1,0 +1,3 @@
+[submodule "plasmaliq_paper"]
+	path = plasmaliq_paper
+	url = ../plasmaliq_paper/
