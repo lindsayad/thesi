@@ -421,9 +421,8 @@
         by \\
         \@author
             \vfill
-       \ncsu@titlepageparagraph
-           \vfill
-       \ncsu@program\\[2.5\ncsu@lineheight]
+       \ncsu@titlepageparagraph\\[3\ncsu@lineheight]
+       \ncsu@program\\[3\ncsu@lineheight]
        \ncsu@citystate\\[1\ncsu@lineheight]
        \ncsu@year
            \vfill
