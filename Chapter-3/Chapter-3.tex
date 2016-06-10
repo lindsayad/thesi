@@ -43,7 +43,7 @@ where $\partial\Omega$ represents the domain boundaries. Integrals over the doma
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics{2d_mesh.png}
+  \includegraphics[width=\maxwidth{\textwidth}]{2d_mesh.png}
   \caption{An example two-dimensional mesh. The domain is sub-divided into triangular elements.}
   \label{fig:mesh}
 \end{figure}
@@ -210,17 +210,14 @@ Zapdos tries to be as generic and modular as possible in the formulation of its 
     \item [a] \(\displaystyle \vec{\Gamma_e} = \mu_e(N_e,E_n) \nabla V l_c e^{N_e} - D_e(N_e,E_n) e^{N_e} \nabla N_e l_c\)
   \end{TableNotes}
 
-  \begin{longtable}{>{\centering}m{2.25in}| >{\centering}m{1.75in}| >{\raggedright\arraybackslash}m{2in}}
-    %% \hline\hline
-    %% This goes at & the top of the & first heading\\
-    %% \hline\hline
-    %% \endfirsthead
+  \begin{longtable}{>{\centering}m{2.25in}| >{\centering}m{1.75in}| >{\raggedright\arraybackslash}m{1.5in}}
+    \caption{Kernels in Zapdos used for simulations presented in \cref{sec:plasliq}} \label{tab:zap_kernels} \\\toprule
+    \textbf{Kernel Name} & \textbf{Governing Eqn. Term}\tnote{a} & \textbf{Description}\\\hline\hline
+    \endfirsthead
+    \caption{Continued} \\\toprule
     \textbf{Kernel Name} & \textbf{Governing Eqn. Term}\tnote{a} & \textbf{Description}\\\hline\hline
     \endhead
-    \caption{Kernels in Zapdos used for simulations presented in \cref{sec:plasliq}}
     \endfoot
-    \caption{Kernels in Zapdos used for simulations presented in \cref{sec:plasliq}}
-    \label{tab:zap_kernels}
     \endlastfoot
 
     ElectronTimeDerivative & \(\displaystyle \psi_i e^u\frac{\partial u}{\partial t}\) & Generic accumulation term\\\hline
@@ -258,13 +255,14 @@ Zapdos implements a variety of auxiliary kernels that, while not essential to th
     %% \item [a]
   \end{TableNotes}
 
-  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{2in}}
+  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{1.5in}}
+    \caption{AuxKernels in Zapdos used for visualization of simulation results described in \cref{sec:plasliq}}\label{tab:aux_kernels}\\\toprule
+    \textbf{AuxKernel Name} & \textbf{Expression} & \textbf{Description}\\\hline\hline
+    \endfirsthead
+    \caption{Continued}\\\toprule
     \textbf{AuxKernel Name} & \textbf{Expression} & \textbf{Description}\\\hline\hline
     \endhead
-    \caption{AuxKernels in Zapdos used for visualization of simulation results described in \cref{sec:plasliq}}
     \endfoot
-    \caption{AuxKernels in Zapdos used for visualization of simulation results described in \cref{sec:plasliq}}
-    \label{tab:aux_kernels}
     \endlastfoot
 
     PowerDep & \(\displaystyle \sgn(q)e N_A\cdot(\sgn(q)\mu\cdot-\nabla V e^{N_k} - D e^{N_k} \nabla N_k) \cdot -\nabla V V_c/l_c^2\) & Amount of power deposited into a user specified specie by Joule Heating\\\hline
@@ -289,13 +287,14 @@ Critical to fully coupling the plasma and liquid phase simulations are the condi
   \begin{TableNotes}
   \end{TableNotes}
 
-  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{2in}}
+  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{1.75in}| >{\raggedright\arraybackslash}m{1.75in}}
+    \caption{Important InterfaceKernels in Zapdos} \label{tab:interface} \\\toprule
+    \textbf{InterfaceKernel Name} & \textbf{Expression} & \textbf{Description}\\\hline\hline
+    \endfirsthead
+    \caption{Continued}\\\toprule
     \textbf{InterfaceKernel Name} & \textbf{Expression} & \textbf{Description}\\\hline\hline
     \endhead
-    \caption{Important InterfaceKernels in Zapdos}
     \endfoot
-    \caption{Important InterfaceKernels in Zapdos}
-    \label{tab:interface}
     \endlastfoot
 
     InterfaceAdvection & \(\displaystyle -\psi_{i,el}\mu_{k,n}\sgn(q_k) e^{N_{k,n}}\nabla V_n \cdot \vec{n} / (l_{c,n}l_{c,el})\) & Used to include the electric field driven advective flux of species $k$ into or out of a neighboring subdomain. The subscript $el$ denotes the subdomain to which the InterfaceAdvection residual is being added. The subscript $n$ denotes the neighboring subdomain. Currently this interface kernel is specific to electrons because the transport coefficients are assumed to be a function of the mean electron energy. A generic interface kernel with constant transport coefficients will have a much simpler Jacobian\\\hline
@@ -368,13 +367,14 @@ A summary of the important boundary condition classes that Zapdos defines are su
   \begin{TableNotes}
   \end{TableNotes}
 
-  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{2in}}
+  \begin{longtable}{>{\centering}m{2in}| >{\centering}m{2in}| >{\raggedright\arraybackslash}m{1.5in}}
+    \caption{Important BoundaryConditions defined by Zapdos} \label{tab:bcs}\\\toprule
+    \textbf{BoundaryCondition Name} & \textbf{Expression (strong form and without scaling factors)} & \textbf{Description}\\\hline\hline
+    \endfirsthead
+    \caption{Continued}\\\toprule
     \textbf{BoundaryCondition Name} & \textbf{Expression (strong form and without scaling factors)} & \textbf{Description}\\\hline\hline
     \endhead
-    \caption{Important BoundaryConditions defined by Zapdos}
     \endfoot
-    \caption{Important BoundaryConditions defined by Zapdos}
-    \label{tab:bcs}
     \endlastfoot
 
     HagelaarIonAdvectionBC & First parenthetical term in \cref{eq:ion_bc_3} & Kinetic advective ion boundary condition\\\hline

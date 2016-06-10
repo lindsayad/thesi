@@ -626,7 +626,7 @@
 %% -------------------------------------------------------------------------- %%
 
 \newlength{\appendixwidth}
-\settowidth{\appendixwidth}{Appendix A}
+\settowidth{\appendixwidth}{Appendix}
 \addtolength{\appendixwidth}{1em}
 \providecommand{\appendixheader}[1]{
     \renewcommand{\ncsu@appendixheader}{#1}
@@ -634,7 +634,7 @@
 
 %% Count the total number of appendices
 \RequirePackage{totcount}
-\regtotcounter{chapter} % chapter counter is used for appendices
+\regtotcounter{chapter} % chapter counter  used for appendices
 
 \AtBeginDocument{%
 %% Since ETD requirements are different than LaTeX's normal formatting of
@@ -668,6 +668,7 @@
     %%  and add the "Appendix " before the letter.  See tocloft documentation.
     \addtocontents{toc}{
         \protect\renewcommand{\protect\cftchappresnum}{Appendix }
+        %% \protect\renewcommand{\protect\cftchapaftersnum}{: }
         \protect\renewcommand{\protect\cftchapnumwidth}{\protect\appendixwidth}
         \protect\renewcommand{\protect\cftchapfont}{\protect\cftsecfont}
         \protect\setlength{\protect\cftbeforechapskip}{\protect\cftbeforesecskip}

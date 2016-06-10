@@ -18,6 +18,9 @@
 \usepackage{listings}  % Allows code printing
 %% \usepackage{color}
 \usepackage{morefloats}
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
 \usepackage{tabularx}
 \def\tabularxcolumn#1{m{#1}}
 \usepackage[flushleft]{threeparttable}
@@ -496,7 +499,7 @@
 \newgeometry{margin=1in,lmargin=1.25in,footskip=\chapterfootskip, includehead, includefoot}
 
 
-\include{Appendix-A/Appendix-A}
+\include{Appendix/Appendix}
 
 \restoregeometry
 
