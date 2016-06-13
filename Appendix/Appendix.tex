@@ -1,3 +1,19 @@
+\makeatletter
+\renewcommand{\DOCH}{%
+  \settoheight{\py}{\CNoV\thechapter}
+  \parskip=0pt plus 1pt % Set parskip to default, just in case v1.31
+  \addtolength{\py}{-1pt}
+  \CNV\FmN{\@chapapp}\par\nobreak
+  \vskip 20\p@
+  \setlength{\myhi}{2\baselineskip}
+  \setlength{\px}{\myhi}
+  \addtolength{\px}{-1\RW}
+  \rule[-1\px]{\RW}{\myhi}\mghrulefill{\RW}\rule[-1\px]{\RW}{\myhi}
+  \par\nobreak
+  \vskip -3\p@% Added -2pt vskip to correct for streched text v1.31
+}
+\makeatother
+
 \chapter{Relevant Code Snippets}
 \label{chap:code_snippets}
 
